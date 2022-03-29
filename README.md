@@ -1,2 +1,1 @@
-# haulk_backend
-Haulk Logistics Backend
+# HAULK LOGISTICS
