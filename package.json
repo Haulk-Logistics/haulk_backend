@@ -1,0 +1,36 @@
+{
+  "name": "haulk_backend",
+  "version": "1.0.0",
+  "description": "Haulk Server",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "set APP_ENV=development && npm run start",
+    "staging": "set APP_ENV=staging && npm run start",
+    "prod": "set APP_ENV=production && npm run start",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Haulk-Logistics/haulk_backend.git"
+  },
+  "keywords": [
+    "logistics"
+  ],
+  "author": "Team Haulk",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Haulk-Logistics/haulk_backend/issues"
+  },
+  "homepage": "https://github.com/Haulk-Logistics/haulk_backend#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.3",
+    "express-validator": "^6.14.0",
+    "mongoose": "^6.2.9"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
