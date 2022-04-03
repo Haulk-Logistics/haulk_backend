@@ -46,7 +46,7 @@ app.get("/", async function (req, res, next) {
     res.status(200).json({
         'status': 'success',
         'statusCode': 200,
-        'message': 'Welcome to the Haulk Logistics API'
+        'message': `Welcome to the Haulk ${process.env.APP_ENV}Logistics API`
     });
 });
 
