@@ -66,7 +66,7 @@ Files that are has long codes are extremely hard to manage and maintain. Always 
 
 ----------------------------------------------------------
 
-Deployed Automatically
+Deployed Automatici
 ### Important Links To Docs You MIght Need
 
 - Express Validator :-
