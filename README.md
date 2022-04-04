@@ -50,6 +50,16 @@ The goal of the route is to guide the request to the correct handler function
 
 ## DEPLOYMENT RULES / GUIDELINES
 
+Never push directly to the defualt branches.
+- production
+- staging
+- development
+
+For every change to the codebase, no matter how tiny, create a new branch for it, work on that branch and push to it, then make a pull request from that branch to the development branch.
+Staging and Production branches are out of bounds and should never be pushed to or make a pull request against them.
+
+Steps To Create a Pull Request:
+
 ----------------------------------------------------------
 
 ## DEVELOPEMENT RULES / GUIDELINES WRITING SERVER CODES
