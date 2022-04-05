@@ -60,6 +60,10 @@ Staging and Production branches are out of bounds and should never be pushed to 
 
 Steps To Create a Pull Request:
 
+- Click on the issue assigned to you, at the left side, you see a create branch text button, click on it, and copy the git command there and run it in the root folder of haulk front end git repository.
+
+- Run 'git push' to publish the branch to the remote (haulk front end repo) repository.
+
 ----------------------------------------------------------
 
 ## DEVELOPEMENT RULES / GUIDELINES WRITING SERVER CODES
