@@ -44,7 +44,8 @@ The goal of the route is to guide the request to the correct handler function
 
 - server.js : Responsible for connecting the MongoDB and starting the server.
 
-- app.js : Configure everything that has to do with Express application.server.js : Responsible for connecting the MongoDB and starting the server.
+
+
 
 ----------------------------------------------------------
 
@@ -65,6 +66,8 @@ Steps To Create a Pull Request:
 - Run 'git push' to publish the branch to the remote (haulk front end repo) repository.
 
 - Work on that branch and do what your issue ticket tells you to do
+
+- Once you are done, create a pull request from that branch to the development branch.
 
 ----------------------------------------------------------
 
