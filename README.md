@@ -64,6 +64,8 @@ Steps To Create a Pull Request:
 
 - Run 'git push' to publish the branch to the remote (haulk front end repo) repository.
 
+- Work on that branch and do what your issue ticket tells you to do
+
 ----------------------------------------------------------
 
 ## DEVELOPEMENT RULES / GUIDELINES WRITING SERVER CODES
