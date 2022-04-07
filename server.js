@@ -15,12 +15,15 @@ const PORT = process.env.PORT || 6000;
 const databaseUrl = process.env.MONGOURL;
 
 
+// routes
+const auth = require('./routes/auth.routes');
 
 
 
 
 
 // Middlewares
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
 
@@ -49,6 +52,9 @@ app.get("/", async function (req, res, next) {
         'message': `Welcome to the Haulk ${process.env.APP_ENV} Logistics API`
     });
 });
+
+// SignUp, SignIn, Reset Password, VerifyEmail - Auth Route
+app.use("/api/auth", auth);
 
 
 
