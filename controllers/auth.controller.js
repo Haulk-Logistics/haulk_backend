@@ -66,7 +66,7 @@ auth.signup = async (req, res, next) => {
                 message: "Role must be 'cargoowner' or 'truckdriver'."
             });
         }
-        
+
 
         // Check if user already exists in database
         const emailExist = await User.findOne({
@@ -139,7 +139,7 @@ auth.signup = async (req, res, next) => {
             });
 
         // send a verification email
-       await  mailService.sendEmailVerificationMail(newUser.email, token);
+        await mailService.sendEmailVerificationMail(newUser.email, token);
         return res.status(201).json({
             status: 'success',
             statusCode: 201,
@@ -149,11 +149,10 @@ auth.signup = async (req, res, next) => {
     } catch (error) {
         console.log(error);
         return res.status(500).json({
-                status: 'error',
-                statusCode: 500,
-                message: "Internal server error, please try again, if error persists, contact 'support@haulk.com' ."
-            }
-        );
+            status: 'error',
+            statusCode: 500,
+            message: "Internal server error, please try again, if error persists, contact 'support@haulk.com' ."
+        });
     }
 };
 
@@ -179,7 +178,14 @@ auth.resetPassword = (req, res, next) => {};
 // Verify user email
 auth.verifyUser = async (req, res, next) => {
     try {
-        const token = req.params.token;
+        const token = req.query.t;
+        if (!token) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Token not found'
+            });
+        }
         const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
         const user = await User.findOne({
             _id: decoded._id,
@@ -205,6 +211,50 @@ auth.verifyUser = async (req, res, next) => {
             status: 'success',
             statusCode: 200,
             message: 'User verified successfully'
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            status: 'error',
+            statusCode: 500,
+            message: "Internal server error, please try again, if error persists, contact 'support@haulk.com' "
+        });
+    }
+};
+
+
+// Resend Verification Mail
+auth.resendVerificationEmail = async (req, res, next) => {
+    try {
+        const user = await User.findOne({
+            email: req.body.email
+        });
+        if (!user) {
+            return res.status(404).json({
+                status: 'error',
+                statusCode: 404,
+                message: 'User not found'
+            });
+        }
+        if (user.verified) {
+            return res.status(409).json({
+                status: 'error',
+                statusCode: 409,
+                message: 'User already verified'
+            });
+        }
+        const token = jwt.sign({
+                _id: user._id,
+                email: user.email
+            },
+            process.env.TOKEN_SECRET, {
+                expiresIn: "1h"
+            });
+        await mailService.sendEmailVerificationMail(user.email, token);
+        return res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'Verification email sent successfully'
         });
     } catch (error) {
         console.log(error);
