@@ -13,7 +13,7 @@ const CargoOwner = require('../models/cargo_owner.model');
 
 const auth = {};
 
-// Users should be able to create an account
+// Cargo Owner & Truck Driver should be able to create an account
 auth.signup = async (req, res, next) => {
     try {
         // Confirm All Inputs are Valid
@@ -94,7 +94,9 @@ auth.signup = async (req, res, next) => {
         // Save User to user collection
         const newUser = await user.save();
 
+
         // if new user is a truck driver save to truck driver collection
+        // SIGN UP FOR TRUCK DRIVER
         if (newUser.role === 'truckdriver') {
             const truckDriver = new TruckDriver({
                 userDetails: newUser._id,
@@ -112,6 +114,7 @@ auth.signup = async (req, res, next) => {
         }
 
         // if new user is a cargo owner save to cargo owner collection
+        // SIGN UP FOR CARGO OWNER
         if (newUser.role === 'cargoowner') {
             const cargoowner = new CargoOwner({
                 userDetails: newUser._id,
@@ -147,6 +150,7 @@ auth.signup = async (req, res, next) => {
         });
 
     } catch (error) {
+        // If error, return SERVER error
         console.log(error);
         return res.status(500).json({
             status: 'error',
