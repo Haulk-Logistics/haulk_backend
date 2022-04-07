@@ -5,10 +5,10 @@ require("dotenv").config({
 });
 
 
-const mail={};
+const mail = {};
 
 mail.sendEmailVerificationMail = async (email, token) => {
-    sgMail.setApiKey('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');
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
         to: email,
         from: 'bezaleelnwabia@gmail.com', // Use the email address or domain you verified above
@@ -18,7 +18,6 @@ mail.sendEmailVerificationMail = async (email, token) => {
         <div>
                   <p>Welcome,
                   Please verify your account by clicking <a href=${`${process.env.HOSTURL}/api/auth/verifyUser/?t=${token}`}>this</a> link
-    
                   </p>
           </div>
           `,
@@ -34,5 +33,8 @@ mail.sendEmailVerificationMail = async (email, token) => {
 
 
 };
+
+
+
 
 module.exports = mail;
