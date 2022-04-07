@@ -50,6 +50,9 @@ app.get("/", async function (req, res, next) {
     });
 });
 
+// Booking Truck route
+app.use('/api/', require('./routes/api/v1/book_truck.routes'));
+
 
 
 // handle undefined Routes
