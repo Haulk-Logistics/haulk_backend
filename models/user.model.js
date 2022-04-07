@@ -48,22 +48,29 @@ const userSchema = new Schema({
     password: {
         type: String,
         select: false,
-        require: true,
+        required: true,
         min: 6
     },
 
     //USER ROLE
     role: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Role"
+        type: String,
+        required: true,
+        enum: ["cargoowner", "truckdriver", "admin"],
     },
 
-    //STATUS
-    accountStatus: {
-        type: String,
-        enum: ['Pending', 'Active'],
-        default: 'Pending'
-    }
+    //is account verified
+    verified: {
+        type: Boolean,
+        index: true,
+        default: false
+    },
+
+    // confirmationCode: {
+    //     type: String,
+    //     unique: true
+    // },
+
 
 
 });

@@ -15,12 +15,15 @@ const PORT = process.env.PORT || 6000;
 const databaseUrl = process.env.MONGOURL;
 
 
+// routes
+const auth = require('./routes/auth.routes');
 
 
 
 
 
 // Middlewares
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
 
@@ -52,6 +55,8 @@ app.get("/", async function (req, res, next) {
 
 // Booking Truck route
 app.use('/api/', require('./routes/api/v1/book_truck.routes'));
+// SignUp, SignIn, Reset Password, VerifyEmail - Auth Route
+app.use("/api/auth", auth);
 
 
 
