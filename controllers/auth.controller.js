@@ -160,10 +160,12 @@ auth.signup = async (req, res, next) => {
 
 
 // Users should be able to log in with their email and password
-auth.signin = (req, res, next) => {};
+auth.signin = (req, res, next) => {
 //Only users with users.verified = true; should be able to log in
 //If  users.verified = false; should not be able to log in, an error message should be displayed
 // "unverified account , please verify your email"
+
+};
 
 
 // Users should be able to log out
@@ -178,7 +180,7 @@ auth.resetPassword = (req, res, next) => {};
 // Verify user email
 auth.verifyUser = async (req, res, next) => {
     try {
-        const token = req.query.t;
+        const token =await req.query.t;
         if (!token) {
             return res.status(400).json({
                 status: 'error',
