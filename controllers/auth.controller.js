@@ -164,19 +164,161 @@ auth.signup = async (req, res, next) => {
 
 
 // Users should be able to log in with their email and password
-auth.signin = (req, res, next) => {
-//Only users with users.verified = true; should be able to log in
-//If  users.verified = false; should not be able to log in, an error message should be displayed
-// "unverified account , please verify your email"
+auth.signin = async (req, res, next) => {
+    try {
+        if (!req.body.email) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Email is required'
+            });
+        }
+        if (!req.body.password) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Password is required'
+            });
+        }
 
+        const email = req.body.email;
+        const password = req.body.password;
+
+        // Check for user
+        const userDetails = await User.findOne({
+            email: email
+        });
+        if (!userDetails) {
+            return res.status(404).json({
+                status: 'error',
+                statusCode: 404,
+                message: 'User not found'
+            });
+        }
+
+        // Check if password is correct
+        try {
+            console.log(password);
+            console.log(userDetails.password);
+            console.log(userDetails)
+
+            const verifyPassword = await bcrypt.compare(password, userDetails.password);
+            if (!verifyPassword) {
+                return res.status(401).json({
+                    status: 'error',
+                    statusCode: 401,
+                    message: 'Invalid password'
+                });
+            }
+
+        } catch (error) {
+            console.log('bcrpt error', error);
+
+            return res.status(500).json({
+                status: 'error',
+                statusCode: 500,
+                message: "Internal server error, please try again, if error persists, contact 'support@haulk.com'"
+            });
+        }
+        // check if user is verified
+        if (userDetails.verified === false) {
+            return res.status(401).json({
+                status: 'error',
+                statusCode: 401,
+                message: 'unverified account , please verify your email'
+            });
+        }
+
+        // Check if user is a truck driver then search for truck driver
+        if (userDetails.role === 'truckdriver') {
+            const truckDriver = await TruckDriver.findOne({
+                userDetails: userDetails._id
+            }).populate('userDetails');
+
+            console.log(truckDriver);
+
+            if (!truckDriver) {
+                return res.status(404).json({
+                    status: 'error',
+                    statusCode: 404,
+                    message: 'Truck Driver Account Not Found'
+                });
+            }
+
+            return res.status(200).json({
+                status: 'success',
+                statusCode: 200,
+                message: 'Truck Driver logged in successfully',
+                token: jwt.sign({
+                    _id: userDetails._id
+                }, process.env.TOKEN_SECRET),
+                user_details: {
+                    user_id: truckDriver.userDetails._id,
+                    role: truckDriver.userDetails.role,
+                    firstName: truckDriver.userDetails.firstName,
+                    lastName: truckDriver.userDetails.lastName,
+                    email: truckDriver.userDetails.email,
+                    phoneNumber: truckDriver.userDetails.phoneNumber,
+                    verified: truckDriver.userDetails.verified,
+                    wallet: 'Comming Soon...'
+                }
+            });
+        }
+
+        // Check if user is a cargo owner then search for cargo owner
+        if (userDetails.role === 'cargoowner') {
+
+            // Confirm user is a cargo owner
+            const cargoOwner = await CargoOwner.findOne({
+                userDetails: userDetails._id
+            }).populate('userDetails');
+
+            if (!cargoOwner) {
+                return res.status(404).json({
+                    status: 'error',
+                    statusCode: 404,
+                    message: 'Cargo Owner Account Not Found'
+                });
+            }
+
+            return res.status(200).json({
+                status: 'success',
+                statusCode: 200,
+                message: 'Cargo Owner logged in successfully',
+                token: jwt.sign({
+                    _id: userDetails._id
+                }, process.env.TOKEN_SECRET),
+                user_details: {
+                    user_id: cargoOwner.userDetails._id,
+                    role: cargoOwner.userDetails.role,
+                    firstName: cargoOwner.userDetails.firstName,
+                    lastName: cargoOwner.userDetails.lastName,
+                    email: cargoOwner.userDetails.email,
+                    phoneNumber: cargoOwner.userDetails.phoneNumber,
+                    verified: cargoOwner.userDetails.verified,
+                }
+            });
+
+        }
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            status: 'error',
+            statusCode: 500,
+            message: "Internal server error, please try again, if error persists, contact 'support@haulk.com' ."
+        });
+
+    }
 };
 
 
 // Users should be able to log out
-auth.signout = (req, res, next) => {};
+// auth.signout = (req, res, next) => {};
 
 // Users should be able to reset their password
-auth.resetPassword = (req, res, next) => {};
+auth.resetPassword = (req, res, next) => {
+};
 
 
 
@@ -184,7 +326,7 @@ auth.resetPassword = (req, res, next) => {};
 // Verify user email
 auth.verifyUser = async (req, res, next) => {
     try {
-        const token =await req.query.t;
+        const token = await req.query.t;
         if (!token) {
             return res.status(400).json({
                 status: 'error',
