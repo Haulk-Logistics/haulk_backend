@@ -13,7 +13,6 @@ mail.sendEmailVerificationMail = async (email, token) => {
         to: email,
         from: 'bezaleelnwabia@gmail.com', // Use the email address or domain you verified above
         subject: 'Verify Your Email Address',
-        // text: 'and easy to do anywhere, even with Node.js',
         html: `
         <div>
                   <p>Welcome,
@@ -34,6 +33,31 @@ mail.sendEmailVerificationMail = async (email, token) => {
 
 };
 
+
+
+mail.sendPasswordResetEmail = async (email, token) => {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+        to: email,
+        from: 'bezaleelnwabia@gmail.com',
+        subject: 'Reset Password',
+        html: `
+        <div>
+        <p>
+        Reset your account password by clicking <a href=${`${process.env.HOSTURL}/api/auth/resetPassword/?t=${token}`}>this</a> link
+        </p>
+        </div> 
+        `,
+    };
+    try {
+        await sgMail.send(msg);
+    } catch (error) {
+        console.error(error);
+        if (error.response) {
+            console.error(error.response.body)
+        }
+    }
+};
 
 
 
