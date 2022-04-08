@@ -2,7 +2,10 @@ const express = require("express");
 const { body } = require("express-validator");
 const {
   get_quotation,
+  make_order
 } = require("../../../controllers/book_truck.controllers");
+const { upload } = require("../../../utils/cloudinary");
+// Router
 const router = express.Router();
 
 router.post(
@@ -18,5 +21,7 @@ router.post(
   body("proof_url").not().isEmpty().trim().escape(),
   get_quotation
 );
+
+router.post('/upload', upload.single('image'), make_order);
 
 module.exports = router;

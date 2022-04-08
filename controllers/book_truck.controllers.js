@@ -1,6 +1,6 @@
 const { calculate_amount } = require("../utils/calculate_amount.util");
 const book_truck_controller = {};
-
+const { upload_image, upload } = require('../utils/cloudinary');
 book_truck_controller.get_quotation = async (req,res) => {
     const data = req.body;
     const errors = validationResult(req);
@@ -24,8 +24,9 @@ book_truck_controller.get_quotation = async (req,res) => {
     }
 }
 
-book_truck_controller.make_payments = async (req,res) => {
-    const data = req.body;
+book_truck_controller.make_order = async (req,res) => {
+    const data = req.files;
+    console.log(data)
     
 }
 
