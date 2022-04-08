@@ -8,6 +8,7 @@ const { upload } = require("../../../utils/cloudinary");
 // Router
 const router = express.Router();
 
+// post to book a truck
 router.post(
   "/book_a_truck",
   body("nature_off_goods").not().isEmpty().trim().escape(),
@@ -22,6 +23,7 @@ router.post(
   get_quotation
 );
 
+//  testing the upload funtion
 router.post('/upload', upload.single('image'), make_order);
 
 module.exports = router;
