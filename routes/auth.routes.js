@@ -9,9 +9,14 @@ const authController = require("../controllers/auth.controller");
 
 
 // auth routes
+
+// signup
 router.post('/signup', authController.signup);
-router.put('/verifyUser/', authController.verifyUser);
+router.get('/verifyUser/', authController.verifyUser);
 router.put('/resendVerificationEmail', authController.resendVerificationEmail);
+
+// SignIn
+router.post('/signin', authController.signin);
 
 
 module.exports = router;
