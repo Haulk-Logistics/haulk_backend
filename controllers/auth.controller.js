@@ -456,6 +456,8 @@ auth.resendVerificationEmail = async (req, res, next) => {
 // Users should be able to log out
 // auth.signout = (req, res, next) => {};
 
+
+
 // Users should get a link to reset their password
 auth.sendResetPasswordMail = async (req, res, next) => {
     try {
@@ -520,6 +522,7 @@ auth.changePassword = async (req, res, next) => {
     try {
         // TODO: I WILL BE GETTING TOKEN FROM HEADER
         const token = await req.query.t;
+
         if (!token) {
             return res.status(400).json({
                 status: 'error',
