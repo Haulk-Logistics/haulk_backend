@@ -19,6 +19,7 @@ const auth = {};
 
 // Cargo Owner & Truck Driver should be able to create an account
 auth.signup = async (req, res, next) => {
+
     try {
         // Confirm All Inputs are Valid
         if (!req.body.firstName) {
@@ -243,8 +244,6 @@ auth.signin = async (req, res, next) => {
             }
 
         } catch (error) {
-            console.log('bcrpt error', error);
-
             return res.status(500).json({
                 status: 'error',
                 statusCode: 500,

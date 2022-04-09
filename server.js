@@ -17,28 +17,31 @@ const databaseUrl = process.env.MONGOURL;
 
 // routes
 const auth = require('./routes/auth.routes');
+const admin = require('./routes/admin.routes');
 
 
 
 
 
 // Middlewares
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({
+    extended: false
+}));
 app.use(express.json());
 app.use(cors());
 
 
 
 // Connect To Database
-const connectionParams={
+const connectionParams = {
     useNewUrlParser: true,
-    useUnifiedTopology: true 
+    useUnifiedTopology: true
 }
-mongoose.connect(databaseUrl,connectionParams)
-    .then( () => {
+mongoose.connect(databaseUrl, connectionParams)
+    .then(() => {
         console.log(`Successfully Connected to Haulk-Mongo ${process.env.APP_ENV} Database `)
     })
-    .catch( (err) => {
+    .catch((err) => {
         console.error(`Error connecting to Haulk-Mongo ${process.env.APP_ENV} database. ${err}`);
     })
 
@@ -52,6 +55,10 @@ app.get("/", async function (req, res, next) {
         'message': `Welcome to the Haulk ${process.env.APP_ENV} Logistics API`
     });
 });
+
+// Haulk Admin Route
+app.use('/admin', admin);
+
 
 // SignUp, SignIn, Reset Password, VerifyEmail - Auth Route
 app.use("/api/auth", auth);
