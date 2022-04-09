@@ -24,6 +24,6 @@ router.post(
 );
 
 //  testing the upload funtion
-router.post('/upload', upload.single('image'), make_order);
+router.post('/uploads',  make_order);
 
 module.exports = router;
