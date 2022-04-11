@@ -2,13 +2,10 @@ var path = require("path");
 require("dotenv").config({
   path: path.join(__dirname, `/configs/${process.env.APP_ENV?.trim()}.env`),
 });
-const formidableMiddleware = require('express-formidable');
-
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const cloudinary = require("cloudinary");
-const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = process.env.PORT || 6000;
@@ -18,11 +15,9 @@ const databaseUrl = process.env.MONGOURL;
 const auth = require("./routes/auth.routes");
 
 // Middlewares
-// app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.urlencoded({limit:'50mb' ,extended: false}))
 app.use(cors());
-app.use(formidableMiddleware());
 
 // this would setup cloudinary
 cloudinary.v2.config({

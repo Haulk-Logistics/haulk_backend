@@ -1,4 +1,5 @@
 const { validationResult } = require("express-validator");
+const formidable = require('formidable');
 const { calculate_amount } = require("../utils/calculate_amount.util");
 const book_truck_controller = {};
 const { upload_image } = require("../utils/cloudinary");
@@ -26,10 +27,19 @@ book_truck_controller.get_quotation = async (req, res) => {
 };
 
 book_truck_controller.make_order = async (req, res) => {
-  console.log(req.body)
-  // uploads to cloudinary
-  const result = await upload_image(req.files.image.path, "Driver");
-  console.log(result);
+  const form = new formidable.IncomingForm();
+  form.parse(req, async function(err, fields,files) {
+    const file_path = files.image.filepath;
+    if(file_path) {
+      // uploads to cloudinary
+      const result = await upload_image(file_path, "Driver");
+      console.log(result);
+    }else{
+      console.log('No path inputed')
+    }
+  })
+  // console.log(req.body)
+ 
 };
 
 module.exports = book_truck_controller;
