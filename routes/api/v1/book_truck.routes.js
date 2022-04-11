@@ -4,7 +4,6 @@ const {
   get_quotation,
   make_order
 } = require("../../../controllers/book_truck.controllers");
-const { upload } = require("../../../utils/cloudinary");
 // Router
 const router = express.Router();
 
