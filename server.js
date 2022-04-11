@@ -3,17 +3,32 @@ require("dotenv").config({
     path: path.join(__dirname, `/configs/${process.env.APP_ENV?.trim()}.env`),
 });
 
-
+// Modules
 const express = require('express');
 const cors = require('cors');
 const mongoose = require("mongoose");
-
+const swaggerJSDoc = require('swagger-jsdoc');
 
 
 const app = express();
 const PORT = process.env.PORT || 6000;
 const databaseUrl = process.env.MONGOURL;
 
+const swaggerDefinition = {
+    info: {
+        title: 'Animals',
+        version: '1.0.0',
+        description: 'All things animlas',
+    },
+    host: `localhost:${PORT}`,
+    basePath: '/',
+};
+
+const options = {
+    swaggerDefinition,
+    apis: [path.resolve(__dirname, 'server.js')],
+};
+const swaggerSpec = swaggerJSDoc(options);
 
 // routes
 const auth = require('./routes/auth.routes');
