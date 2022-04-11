@@ -8,5 +8,5 @@ const upload_image = async (file, folder) => {
 };
 
 module.exports = {
-  upload_image,
+  upload_image
 };
