@@ -1,6 +1,6 @@
 const cloudinary = require("cloudinary").v2;
-const upload_image = async (file, folder) => {
-  const upload = cloudinary.uploader.upload(file, {
+const upload_image = async (files, folder) => {
+  const upload = cloudinary.uploader.upload(files, {
     resource_type: "auto",
     folder: folder,
   });
