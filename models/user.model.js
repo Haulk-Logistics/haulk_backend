@@ -66,10 +66,7 @@ const userSchema = new Schema({
         default: false
     },
 
-    // confirmationCode: {
-    //     type: String,
-    //     unique: true
-    // },
+ 
 
 
 
