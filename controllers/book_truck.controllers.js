@@ -2,7 +2,7 @@ const { validationResult } = require("express-validator");
 const formidable = require('formidable');
 const { calculate_amount } = require("../utils/calculate_amount.util");
 const book_truck_controller = {};
-const { upload_image } = require("../utils/cloudinary");
+const { upload_image } = require('../services/cloudinary.services')
 book_truck_controller.get_quotation = async (req, res) => {
   const data = req.body;
   const errors = validationResult(req);

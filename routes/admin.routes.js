@@ -11,7 +11,7 @@ const adminController = require("../controllers/admin.controller");
 
 // router.post("/auth/signup", adminController.signup);
 router.post("/auth/signin", adminController.signIn);
-router.get("/getAllAdmins", adminController.getAllAdmins);
+// router.get("/getAllAdmins", adminController.getAllAdmins);
 
 
 
