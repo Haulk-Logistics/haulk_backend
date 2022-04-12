@@ -69,6 +69,8 @@ Steps To Create a Pull Request:
 
 - Once you are done, create a pull request from that branch to the development branch.
 
+link to video : 
+
 ----------------------------------------------------------
 
 ## DEVELOPEMENT RULES / GUIDELINES WRITING SERVER CODES
@@ -81,7 +83,11 @@ Writing a difficult piece of code where it’s difficult to understand what you 
 
 Files that are has long codes are extremely hard to manage and maintain. Always keep an eye on code length in a file, and if they become too long, try to split them into modules packed in a folder as files that are related together.
 
-### 03. Anything/Everything that is likely to vary between deploys (staging, production, developer environments, etc). Should be added to .ENV. Do not store config as constants in the code. This is a violation of twelve-factor, which requires strict separation of config from code. Config varies substantially across deploys, code does not
+### 03. Anything/Everything that is likely to vary between deploys (staging, production, developer environments, etc). Should be added to .ENV. Do not store config as constants in the code. This is a violation of twelve-factor, which requires strict separation of config from code. Config varies substantially across deploys, code does not.
+
+### 04. Naming Convention
+
+When naming a variable, use camelCase. When naming a function, use camelCase. When naming a class, use PascalCase. When naming a module, use PascalCase. lets try to avoid a_b_c naming convention, it makes code harder to read.
 
 ----------------------------------------------------------
 
