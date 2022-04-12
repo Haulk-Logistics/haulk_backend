@@ -9,7 +9,7 @@ const router = express.Router();
 
 // post to book a truck
 router.post(
-  "/book_a_truck",
+  "/get_quotation",
   body("nature_off_goods").not().isEmpty().trim().escape(),
   body("truck_type").not().isEmpty().trim().escape(),
   body("drop_off_location").not().isEmpty().trim().escape(),
@@ -22,7 +22,7 @@ router.post(
   get_quotation
 );
 
-//  testing the upload funtion
-router.post('/uploads',  make_order);
+//  booking a truck and make payment for the truck
+router.post('/book_a_truck',  make_order);
 
 module.exports = router;
