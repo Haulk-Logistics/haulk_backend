@@ -7,6 +7,11 @@ const truckDriverSchema = new Schema({
         ref: 'User'
     },
 
+    stateOfResidence: {
+        type: String,
+        required: true
+    },
+
     // wallet: {
         
     //   },

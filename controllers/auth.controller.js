@@ -94,8 +94,6 @@ auth.signup = async (req, res, next) => {
             });
         }
 
-
-
         // Check if user already exists in database
         const emailExist = await User.findOne({
             email: req.body.email
@@ -110,72 +108,96 @@ auth.signup = async (req, res, next) => {
         }
 
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        const user = new User({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            phoneNumber: req.body.phoneNumber,
-            password: hashedPassword,
-            role: req.body.role,
-            verified: false,
-        });
-        // Save User to user collection
-        const newUser = await user.save();
-
 
         // if new user is a truck driver save to truck driver collection
         // SIGN UP FOR TRUCK DRIVER
-        if (newUser.role === 'truckdriver') {
-            const truckDriver = new TruckDriver({
-                userDetails: newUser._id,
-            });
-            try {
-                await truckDriver.save();
-            } catch (error) {
-                console.log(error);
-                return res.status(500).json({
+        if (req.body.role === 'truckdriver') {
+
+            //Verify Other Truck Driver Details
+
+            // Verify stateOfResidence
+            if (!req.body.stateOfResidence) {
+                return res.status(400).json({
                     status: 'error',
-                    statusCode: 500,
-                    message: "Internal server error, please try again, if error persists, contact 'support@haulk.com' ."
+                    statusCode: 400,
+                    message: 'State of residence is required'
                 });
             }
+            const user = new User({
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                email: req.body.email,
+                phoneNumber: req.body.phoneNumber,
+                password: hashedPassword,
+                role: req.body.role,
+                verified: false,
+            });
+            // Save User to user collection
+            const newUser = await user.save();
+            const truckDriver = new TruckDriver({
+                userDetails: newUser._id,
+                stateOfResidence: req.body.stateOfResidence,
+            });
+
+            await truckDriver.save();
+            // Generate JWT Token
+            const token = jwt.sign({
+                    _id: newUser._id,
+                    email: newUser.email
+                },
+                process.env.TOKEN_SECRET, {
+                    expiresIn: "1h"
+                });
+
+            // send a verification email
+            await mailService.sendEmailVerificationMail(newUser.email, token);
+            return res.status(201).json({
+                status: 'success',
+                statusCode: 201,
+                message: "Truck Driver created successfully, Please check your mail box to verify your account",
+            });
         }
 
         // if new user is a cargo owner save to cargo owner collection
         // SIGN UP FOR CARGO OWNER
-        if (newUser.role === 'cargoowner') {
+        if (req.body.role === 'cargoowner') {
+            const user = new User({
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                email: req.body.email,
+                phoneNumber: req.body.phoneNumber,
+                password: hashedPassword,
+                role: req.body.role,
+                verified: false,
+            });
+            // Save User to user collection
+            const newUser = await user.save();
+
             const cargoowner = new CargoOwner({
                 userDetails: newUser._id,
             });
-            try {
-                await cargoowner.save();
-            } catch (error) {
-                console.log(error);
-                return res.status(500).json({
-                    status: 'error',
-                    statusCode: 500,
-                    message: "Internal server error, please try again, if error persists, contact 'support@haulk.com' ."
+
+            // Save cargo owner to cargo owner collection
+            await cargoowner.save();
+
+            // Generate JWT Token
+            const token = jwt.sign({
+                    _id: newUser._id,
+                    email: newUser.email
+                },
+                process.env.TOKEN_SECRET, {
+                    expiresIn: "1h"
                 });
-            }
 
-        }
-
-        // Generate JWT Token
-        const token = jwt.sign({
-                _id: newUser._id,
-                email: newUser.email
-            },
-            process.env.TOKEN_SECRET, {
-                expiresIn: "1h"
+            // send a verification email
+            await mailService.sendEmailVerificationMail(newUser.email, token);
+            return res.status(201).json({
+                status: 'success',
+                statusCode: 201,
+                message: "Cargo Owner Account created successfully, Please check your mail box to verify your account",
             });
 
-        // send a verification email
-        await mailService.sendEmailVerificationMail(newUser.email, token);
-        return res.status(201).json({
-            status: 'success',
-            statusCode: 201,
-            message: "User created successfully, Please check your mail box to verify your account",
-        });
+        }
 
     } catch (error) {
         // If error, return SERVER error
@@ -450,11 +472,6 @@ auth.resendVerificationEmail = async (req, res, next) => {
         });
     }
 };
-
-
-// Users should be able to log out
-// auth.signout = (req, res, next) => {};
-
 
 
 // Users should get a link to reset their password

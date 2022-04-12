@@ -14,22 +14,6 @@ const app = express();
 const PORT = process.env.PORT || 6000;
 const databaseUrl = process.env.MONGOURL;
 
-const swaggerDefinition = {
-    info: {
-        title: 'Animals',
-        version: '1.0.0',
-        description: 'All things animlas',
-    },
-    host: `localhost:${PORT}`,
-    basePath: '/',
-};
-
-const options = {
-    swaggerDefinition,
-    apis: [path.resolve(__dirname, 'server.js')],
-};
-const swaggerSpec = swaggerJSDoc(options);
-
 // routes
 const auth = require('./routes/auth.routes');
 const admin = require('./routes/admin.routes');
