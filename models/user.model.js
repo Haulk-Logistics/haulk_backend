@@ -40,7 +40,7 @@ const userSchema = new Schema({
     phoneNumber: {
         type: String,
         required: true,
-        minlength: [11, 'Phone number must be at least 10 characters long'],
+        minlength: [11, 'Phone number must be at least 11 characters long'],
         maxlength: [11, 'Phone number must be less than 11 characters'],
     },
 
@@ -56,13 +56,13 @@ const userSchema = new Schema({
     role: {
         type: String,
         required: true,
-        enum: ["cargoowner", "truckdriver", "admin"],
+        enum: ["cargoowner", "truckdriver"],
     },
 
     //is account verified
     verified: {
         type: Boolean,
-        index: true,
+        // index: true,
         default: false
     },
 

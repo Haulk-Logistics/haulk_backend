@@ -4,6 +4,10 @@ const { calculate_amount } = require("../utils/calculate_amount.util");
 const book_truck_controller = {};
 const { upload_image } = require("../services/cloudinary.services");
 const getDistanceFromLatLonInKm = require("../utils/calculate_distance");
+
+
+
+// Get Qoutation for a truck
 book_truck_controller.get_quotation = async (req, res) => {
   const data = req.body;
   const errors = validationResult(req);
