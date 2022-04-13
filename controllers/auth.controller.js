@@ -46,7 +46,6 @@ auth.signup = async (req, res, next) => {
             });
         }
 
-        body('email').isEmail().withMessage('Email is required').toLowerCase();
 
         if (!req.body.phoneNumber) {
             return res.status(400).json({
@@ -55,8 +54,6 @@ auth.signup = async (req, res, next) => {
                 message: 'Phone number is required'
             });
         }
-        body('phoneNumber').isMobilePhone('en-NG').withMessage('Phone number is invalid');
-
 
         if (!req.body.password) {
             return res.status(400).json({
@@ -65,10 +62,6 @@ auth.signup = async (req, res, next) => {
                 message: 'Password is required'
             });
         }
-        body('password').isLength({
-            min: 6
-        }).withMessage('Password must be at least 6 characters long').toLowerCase();
-
 
         if (!req.body.role) {
             return res.status(400).json({
@@ -77,6 +70,7 @@ auth.signup = async (req, res, next) => {
                 message: 'Role is required'
             });
         }
+
         if (req.body.role !== 'cargoowner' && req.body.role !== 'truckdriver') {
             return res.status(400).json({
                 status: 'error',
@@ -86,6 +80,7 @@ auth.signup = async (req, res, next) => {
         }
 
         const errors = validationResult(req);
+
         if (!errors.isEmpty()) {
             return res.status(400).json({
                 status: 'error',
@@ -109,34 +104,24 @@ auth.signup = async (req, res, next) => {
 
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
+        const user = new User({
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            phoneNumber: req.body.phoneNumber,
+            password: hashedPassword,
+            role: req.body.role,
+            verified: false,
+        });
+        // Save User to user collection
+        const newUser = await user.save();
+
+
         // if new user is a truck driver save to truck driver collection
         // SIGN UP FOR TRUCK DRIVER
         if (req.body.role === 'truckdriver') {
-
-            //Verify Other Truck Driver Details
-
-            // Verify stateOfResidence
-            if (!req.body.stateOfResidence) {
-                return res.status(400).json({
-                    status: 'error',
-                    statusCode: 400,
-                    message: 'State of residence is required'
-                });
-            }
-            const user = new User({
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                email: req.body.email,
-                phoneNumber: req.body.phoneNumber,
-                password: hashedPassword,
-                role: req.body.role,
-                verified: false,
-            });
-            // Save User to user collection
-            const newUser = await user.save();
             const truckDriver = new TruckDriver({
                 userDetails: newUser._id,
-                stateOfResidence: req.body.stateOfResidence,
             });
 
             await truckDriver.save();
@@ -151,6 +136,7 @@ auth.signup = async (req, res, next) => {
 
             // send a verification email
             await mailService.sendEmailVerificationMail(newUser.email, token);
+
             return res.status(201).json({
                 status: 'success',
                 statusCode: 201,
@@ -161,18 +147,6 @@ auth.signup = async (req, res, next) => {
         // if new user is a cargo owner save to cargo owner collection
         // SIGN UP FOR CARGO OWNER
         if (req.body.role === 'cargoowner') {
-            const user = new User({
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                email: req.body.email,
-                phoneNumber: req.body.phoneNumber,
-                password: hashedPassword,
-                role: req.body.role,
-                verified: false,
-            });
-            // Save User to user collection
-            const newUser = await user.save();
-
             const cargoowner = new CargoOwner({
                 userDetails: newUser._id,
             });
@@ -191,6 +165,8 @@ auth.signup = async (req, res, next) => {
 
             // send a verification email
             await mailService.sendEmailVerificationMail(newUser.email, token);
+
+            // Account Created Successfully
             return res.status(201).json({
                 status: 'success',
                 statusCode: 201,
@@ -200,6 +176,7 @@ auth.signup = async (req, res, next) => {
         }
 
     } catch (error) {
+
         // If error, return SERVER error
         console.log(error);
         return res.status(500).json({
@@ -220,8 +197,6 @@ auth.signin = async (req, res, next) => {
                 message: 'Email is required'
             });
         }
-        body('email').isEmail().withMessage('Email is required').toLowerCase();
-
         if (!req.body.password) {
             return res.status(400).json({
                 status: 'error',
@@ -229,7 +204,6 @@ auth.signin = async (req, res, next) => {
                 message: 'Password is required'
             });
         }
-        body('password').toLowerCase();
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -255,21 +229,12 @@ auth.signin = async (req, res, next) => {
         }
 
         // Check if password is correct
-        try {
-            const verifyPassword = await bcrypt.compare(password, userDetails.password);
-            if (!verifyPassword) {
-                return res.status(401).json({
-                    status: 'error',
-                    statusCode: 401,
-                    message: 'Invalid password'
-                });
-            }
-
-        } catch (error) {
-            return res.status(500).json({
+        const verifyPassword = await bcrypt.compare(password, userDetails.password);
+        if (!verifyPassword) {
+            return res.status(401).json({
                 status: 'error',
-                statusCode: 500,
-                message: "Internal server error, please try again, if error persists, contact 'support@haulk.com'"
+                statusCode: 401,
+                message: 'Invalid password'
             });
         }
         // check if user is verified
@@ -285,7 +250,7 @@ auth.signin = async (req, res, next) => {
         if (userDetails.role === 'truckdriver') {
             const truckDriver = await TruckDriver.findOne({
                 userDetails: userDetails._id
-            }).populate('userDetails');
+            }).populate('userDetails').populate('truckDetails');
 
             console.log(truckDriver);
 
@@ -312,7 +277,8 @@ auth.signin = async (req, res, next) => {
                     email: truckDriver.userDetails.email,
                     phoneNumber: truckDriver.userDetails.phoneNumber,
                     verified: truckDriver.userDetails.verified,
-                    wallet: 'Comming Soon...'
+                    wallet: 'Comming Soon...',
+                    truckDetails: truckDriver.truckDetails
                 }
             });
         }
@@ -348,8 +314,10 @@ auth.signin = async (req, res, next) => {
                     email: cargoOwner.userDetails.email,
                     phoneNumber: cargoOwner.userDetails.phoneNumber,
                     verified: cargoOwner.userDetails.verified,
+
                 }
             });
+
 
         }
 
@@ -375,32 +343,47 @@ auth.verifyUser = async (req, res, next) => {
                 message: 'Token not found'
             });
         }
-        const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-        const user = await User.findOne({
-            _id: decoded._id,
-            email: decoded.email
-        });
-        if (!user) {
-            return res.status(404).json({
-                status: 'error',
-                statusCode: 404,
-                message: 'User not found'
+
+        jwt.verify(token, process.env.TOKEN_SECRET, async (err, decoded) => {
+            // if token has expired return error
+            if (err) {
+                return res.status(401).json({
+                    status: 'error',
+                    error: err,
+                    statusCode: 401,
+                    message: 'Token has expired'
+                });
+            }
+            // return decoded;
+            const user = await User.findOne({
+                _id: decoded._id,
+                email: decoded.email
             });
-        }
-        if (user.verified) {
-            return res.status(409).json({
-                status: 'error',
-                statusCode: 409,
-                message: 'User already verified'
+            if (!user) {
+                return res.status(404).json({
+                    status: 'error',
+                    statusCode: 404,
+                    message: 'User not found'
+                });
+            }
+            if (user.verified) {
+                return res.status(409).json({
+                    status: 'error',
+                    statusCode: 409,
+                    message: 'User already verified'
+                });
+            }
+            user.verified = true;
+            await user.save();
+            return res.status(200).json({
+                status: 'success',
+                statusCode: 200,
+                message: 'User verified successfully'
             });
-        }
-        user.verified = true;
-        await user.save();
-        return res.status(200).json({
-            status: 'success',
-            statusCode: 200,
-            message: 'User verified successfully'
+
         });
+
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -422,7 +405,6 @@ auth.resendVerificationEmail = async (req, res, next) => {
                 message: 'Email is required'
             });
         }
-        body('email').isEmail().withMessage('Email is required').toLowerCase();
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -484,7 +466,6 @@ auth.sendResetPasswordMail = async (req, res, next) => {
                 message: 'Email is required'
             });
         };
-        body('email').isEmail().withMessage('Email is required').toLowerCase();
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -546,75 +527,84 @@ auth.changePassword = async (req, res, next) => {
                 message: 'Token not found'
             });
         }
-        const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-        const user = await User.findOne({
-            email: decoded.email
+
+        jwt.verify(token, process.env.TOKEN_SECRET, async (err, decoded) => {
+            // if token has expired return error
+            if (err) {
+                return res.status(401).json({
+                    status: 'error',
+                    error: err,
+                    statusCode: 401,
+                    message: 'Token has expired'
+                });
+            }
+            const user = await User.findOne({
+                email: decoded.email
+            });
+            if (!user) {
+                return res.status(404).json({
+                    status: 'error',
+                    statusCode: 404,
+                    message: 'User not found'
+                });
+            }
+            if (user.verified === false) {
+                user.verified = true;
+            }
+
+            const newPassword = req.body.newPassword;
+            // confirm req.body.newPassword fields are not empty
+            if (!newPassword) {
+                return res.status(400).json({
+                    status: 'error',
+                    statusCode: 400,
+                    message: 'New Password field is empty'
+                });
+            }
+
+            const confirmPassword = req.body.confirmPassword;
+            // confirm req.body.confirmPassword fields are not empty
+            if (!confirmPassword) {
+                return res.status(400).json({
+                    status: 'error',
+                    statusCode: 400,
+                    message: 'Confirm Password field is empty'
+                });
+            }
+
+            // Confirm new password and confirm password are same
+            if (newPassword !== confirmPassword) {
+                return res.status(400).json({
+                    status: 'error',
+                    statusCode: 400,
+                    message: 'Passwords do not match'
+                });
+            }
+
+            // if new password is same as old password return error
+            if (newPassword === user.password) {
+                return res.status(400).json({
+                    status: 'error',
+                    statusCode: 400,
+                    message: 'New password is same as old password'
+                });
+            }
+
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+            // Update user password
+            user.password = hashedPassword;
+
+            // Save Updated User
+            await user.save();
+
+            return res.status(200).json({
+                status: 'success',
+                statusCode: 200,
+                message: 'Password changed successfully'
+            });
         });
-        if (!user) {
-            return res.status(404).json({
-                status: 'error',
-                statusCode: 404,
-                message: 'User not found'
-            });
-        }
-        if (user.verified === false) {
-            user.verified = true;
-        }
 
-        const newPassword = req.body.newPassword;
-        // confirm req.body.newPassword fields are not empty
-        if (!newPassword) {
-            return res.status(400).json({
-                status: 'error',
-                statusCode: 400,
-                message: 'New Password field is empty'
-            });
-        }
-        body('newPassword').isLength({
-            min: 6
-        }).withMessage('New Password must be at least 6 characters long');
-
-        const confirmPassword = req.body.confirmPassword;
-        // confirm req.body.confirmPassword fields are not empty
-        if (!confirmPassword) {
-            return res.status(400).json({
-                status: 'error',
-                statusCode: 400,
-                message: 'Confirm Password field is empty'
-            });
-        }
-
-        // Confirm new password and confirm password are same
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({
-                status: 'error',
-                statusCode: 400,
-                message: 'Passwords do not match'
-            });
-        }
-
-        // if new password is same as old password return error
-        if (newPassword === user.password) {
-            return res.status(400).json({
-                status: 'error',
-                statusCode: 400,
-                message: 'New password is same as old password'
-            });
-        }
-
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        // Update user password
-        user.password = hashedPassword;
-
-        // Save Updated User
-        await user.save();
-
-        return res.status(200).json({
-            status: 'success',
-            statusCode: 200,
-            message: 'Password changed successfully'
-        });
     } catch (error) {
         console.log(error);
         return res.status(500).json({
