@@ -54,4 +54,4 @@ registered_at:{
 }
 });
 
-module.exports = model("truck", truckSchema);
+module.exports = model("Truck", truckSchema);
