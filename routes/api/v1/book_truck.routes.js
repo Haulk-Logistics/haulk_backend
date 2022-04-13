@@ -4,6 +4,7 @@ const {
   get_quotation,
   make_order,
 } = require("../../../controllers/book_truck.controllers");
+const { isAuthorized } = require("../../../middlewares/auth.middlewares");
 // Router
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.post(
 //  booking a truck and make payment for the truck
 router.post(
   "/book_a_truck",
+  isAuthorized,
   body("nature_of_good").not().isEmpty().trim().escape(),
   // body("truck_type").not().isEmpty().trim().escape(),
   // body("drop_off_location").not().isEmpty().trim().escape(),

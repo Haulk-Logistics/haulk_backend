@@ -31,7 +31,6 @@ book_truck_controller.get_quotation = async (req, res) => {
 book_truck_controller.make_order = async (req, res) => {
   const form = new formidable.IncomingForm();
   form.parse(req, async function (err, fields, files) {
-    console.log(fields)
     const file_path = files.image.filepath;
     if (file_path) {
       // uploads to cloudinary
