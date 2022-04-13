@@ -1,10 +1,16 @@
 // USERS CONTROLLER
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
-const {
-    body,
-    validationResult
-} = require('express-validator');
+const validatorer = require('express-validator');
+
+
+//body validator
+const body = validatorer.body;
+
+// validationResult function
+const validationResult = validatorer.validationResult;
+
+const formidable = require("formidable");
 
 
 // Services
@@ -81,10 +87,17 @@ auth.signup = async (req, res, next) => {
 
 
         // If role is truckdriver, check if this other fields are there
-        if (req.body.role === 'truckdriver') {
-        
-        
-        }
+        // if (req.body.role === 'truckdriver') {
+
+        //     //  check if truck driver has an id and if its valid
+
+        //     // check if driver license image  is uploaded 
+
+        //     // check if truck type is uploaded 
+
+
+
+        // }
 
         const errors = validationResult(req);
 
@@ -111,7 +124,8 @@ auth.signup = async (req, res, next) => {
 
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-        const user = new User({
+        // Create New User
+        const user = await new User({
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             email: req.body.email,
@@ -525,8 +539,8 @@ auth.sendResetPasswordMail = async (req, res, next) => {
 auth.changePassword = async (req, res, next) => {
     try {
         // TODO: I WILL BE GETTING TOKEN FROM HEADER
-        const token = await req.query.t;
-
+        const token = await req.headers.authorization.split(' ')[1];
+        // The token wil  be placed in the authorization header and will have the Bearer prefix, thats why we need to split it and get the token
         if (!token) {
             return res.status(400).json({
                 status: 'error',
