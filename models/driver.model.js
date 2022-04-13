@@ -1,19 +1,22 @@
 const mongoose = require('mongoose');
-const {Schema} = mongoose;
+const {
+    Schema
+} = mongoose;
 
 const truckDriverSchema = new Schema({
     userDetails: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+
     },
-    truck: {
+    truckDetails: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
-    }
+        ref: 'Truck'
+    },
 });
 
 
 
-const TruckDriver = mongoose.model('Driver', truckDriverSchema);
+const TruckDriver = mongoose.model('TruckDriver', truckDriverSchema);
 
 module.exports = TruckDriver;

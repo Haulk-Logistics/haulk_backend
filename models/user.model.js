@@ -47,7 +47,7 @@ const userSchema = new Schema({
     //PASSWORD
     password: {
         type: String,
-        select: false,
+        // select: false,
         required: true,
         min: 6
     },
@@ -72,7 +72,7 @@ const userSchema = new Schema({
 
 });
 
-const User = mongoose.model('Users', userSchema);
+const User = mongoose.model('User', userSchema);
 
 // Export MOdel
 module.exports = User;
