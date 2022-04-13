@@ -79,6 +79,13 @@ auth.signup = async (req, res, next) => {
             });
         }
 
+
+        // If role is truckdriver, check if this other fields are there
+        if (req.body.role === 'truckdriver') {
+        
+        
+        }
+
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
