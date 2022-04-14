@@ -39,7 +39,7 @@ book_truck_controller.make_order = async (req, res) => {
     const file_path = files.image.filepath;
     if (file_path) {
       // uploads to cloudinary
-      const result = await upload_image(file_path, "Driver");
+      const result = await upload_image(file_path, "Order");
       console.log(result);
     } else {
       console.log("No path inputed");

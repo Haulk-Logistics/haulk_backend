@@ -3,7 +3,6 @@
 const express = require("express");
 const router = express.Router();
 const validatorer = require('express-validator');
-const req = require("express/lib/request");
 
 
 //body validator
@@ -17,14 +16,22 @@ const validationResult = validatorer.validationResult;
 const authController = require("../controllers/auth.controller");
 
 
-// signup
-router.post('/signup',
+// cargo owner signup
+router.post('/signupCargoOwner',
+
     body('email').isEmail().not().isEmpty().withMessage('email is required').toLowerCase(),
     body('phoneNumber').not().isEmpty().isMobilePhone('en-NG').withMessage('phoneNumber is invalid'),
     body('password').not().isEmpty().isLength({
         min: 6
     }).withMessage('Password must be at least 6 characters long').toLowerCase(),
-    authController.signup);
+
+    authController.signupCargoOwner);
+
+
+// truck driver sign up
+router.post('/signupTruckDriver',
+    authController.signupTruckDriver);
+
 
 // SignIn
 router.post('/signin',
