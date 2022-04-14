@@ -44,7 +44,7 @@ mail.sendPasswordResetEmail = async (email, token) => {
         html: `
         <div>
         <p>
-        Reset your account password by clicking <a href=${`${process.env.FRONTEND_URL}/api/auth/resetPassword/?t=${token}`}>this</a> link
+        Reset your account password by clicking <a href=${`${process.env.FRONTEND_URL}/resetPassword/?t=${token}`}>this</a> link
         </p>
         </div> 
         `,
