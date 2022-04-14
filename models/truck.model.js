@@ -17,7 +17,7 @@ const truckSchema = new Schema({
     type: String,
     required: [true, 'truck size is required'],
   },
-  licence_plate_number_image: {
+  licence_plate_number: {
     type: String,
     required: [true, 'licence plate number image is required'],
   },
@@ -39,7 +39,7 @@ const truckSchema = new Schema({
     required: [true, 'certificate of road worthiness image is required']
   },
 
-  transist_goods_license_image: {
+  transit_goods_license_image: {
     type: String,
     required: [true, 'transit goods license image is required']
   },
