@@ -443,7 +443,7 @@ auth.signupTruckDriver = async (req, res, next) => {
                 });
             }
 
-            const hashedPassword = bcrypt.hash(password, 10);
+            const hashedPassword = await bcrypt.hash(password, 10);
 
             // Create New User
             const user = await new User({
@@ -455,8 +455,8 @@ auth.signupTruckDriver = async (req, res, next) => {
                 role: role,
                 verified: false,
             });
-            console.log(hashedPassword);
-            console.log(user);
+            // console.log(hashedPassword);
+            // console.log(user);
 
             // Save User to user collection
             let newUser;
@@ -473,17 +473,8 @@ auth.signupTruckDriver = async (req, res, next) => {
 
 
 
-
-            // if new user is a truck driver save to truck driver collection
-            // SIGN UP FOR TRUCK DRIVER
-            const truckDriver = await new TruckDriver({
-                userDetails: newUser._id,
-            });
-
-            const newTruckDriver = await truckDriver.save();
-
             // Folder Name On Cloudinary
-            const folderName = `${newTruckDriver._id}`;
+            const folderName = `${newUser._id}`;
 
             // Upload Driver License Image
             const driverLicenseImageResult = await upload_image(driverLicenseImage.filepath, folderName);
@@ -495,12 +486,12 @@ auth.signupTruckDriver = async (req, res, next) => {
             const truckImageResult = await upload_image(truckImage.filepath, folderName);
             const driverImageResult = await upload_image(driverImage.filepath, folderName);
 
-
+            // create a new truck
             const truck = await new Truck({
-                truck_driver: newTruckDriver._id,
+                truck_driver: newUser._id,
                 truck_type: truckType,
                 truck_size: truckSize,
-                license_plate_number: licencePlateNumber,
+                licence_plate_number: licencePlateNumber,
                 driver_license_image: driverLicenseImageResult.url,
                 vehicle_license_image: vehicleLicenseImageResult.url,
                 certificate_of_insurance_image: certificateOfInsuranceImageResult.url,
@@ -511,7 +502,18 @@ auth.signupTruckDriver = async (req, res, next) => {
                 driver_image: driverImageResult.url,
             });
 
-            newTruckDriver.truckDetails = await truck._id;
+            const newTruck = await truck.save();
+
+
+            // if new user is a truck driver save to truck driver collection
+            // SIGN UP FOR TRUCK DRIVER
+            const truckDriver = await new TruckDriver({
+                userDetails: newUser._id,
+                truckDetails: newTruck._id,
+            });
+
+            const newTruckDriver = await truckDriver.save();
+
 
             // Generate JWT Token
             const token = jwt.sign({
