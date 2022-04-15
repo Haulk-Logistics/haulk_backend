@@ -11,7 +11,7 @@ mail.sendEmailVerificationMail = async (email, token) => {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
         to: email,
-        from: 'bezaleelnwabia@gmail.com', // Use the email address or domain you verified above
+        from: 'haulklogistics@gmail.com', // Use the email address or domain you verified above
         subject: 'Verify Your Email Address',
         html: `
         <div>
@@ -39,7 +39,7 @@ mail.sendPasswordResetEmail = async (email, token) => {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
         to: email,
-        from: 'bezaleelnwabia@gmail.com',
+        from: 'haulklogistics@gmail.com',
         subject: 'RESET PASSWORD',
         html: `
         <div>
