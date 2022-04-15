@@ -46,6 +46,7 @@ const userSchema = new Schema({
 
     //PASSWORD
     password: {
+
         type: String,
         // select: false,
         required: true,
@@ -66,7 +67,7 @@ const userSchema = new Schema({
         default: false
     },
 
- 
+
 
 
 
