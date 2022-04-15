@@ -36,7 +36,7 @@ router.post('/signupTruckDriver',
 // SignIn
 router.post('/signin',
     body('email').isEmail().withMessage('email is required').toLowerCase(),
-    body('password').not().isEmpty().withMessage('password is required').toLowerCase(), authController.signin);
+    body('password').not().isEmpty().withMessage('password is required'), authController.signin);
 
 // verify user
 router.get('/verifyUser/', authController.verifyUser);
