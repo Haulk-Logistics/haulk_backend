@@ -73,6 +73,14 @@ auth.signupCargoOwner = async (req, res, next) => {
             });
         }
 
+        if (req.body.password.length < 8) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Password must be at least 8 characters long'
+            });
+        }
+
         if (!req.body.role) {
             return res.status(400).json({
                 status: 'error',
@@ -891,13 +899,6 @@ auth.changePassword = async (req, res, next) => {
                 message: 'Token not found'
             });
         }
-        if (token === 'undefined') {
-            return res.status(400).json({
-                status: 'error',
-                statusCode: 400,
-                message: 'Token not found'
-            });
-        }
 
         jwt.verify(token, process.env.TOKEN_SECRET, async (err, decoded) => {
             // if token has expired return error
@@ -912,6 +913,9 @@ auth.changePassword = async (req, res, next) => {
             const user = await User.findOne({
                 email: decoded.email
             });
+
+            const oldPassword = await user.password;
+
             if (!user) {
                 return res.status(404).json({
                     status: 'error',
@@ -923,7 +927,7 @@ auth.changePassword = async (req, res, next) => {
                 user.verified = true;
             }
 
-            const newPassword = req.body.newPassword;
+            const newPassword = await req.body.newPassword;
             // confirm req.body.newPassword fields are not empty
             if (!newPassword) {
                 return res.status(400).json({
@@ -933,7 +937,15 @@ auth.changePassword = async (req, res, next) => {
                 });
             }
 
-            const confirmPassword = req.body.confirmPassword;
+            if (newPassword.length < 8) {
+                return res.status(400).json({
+                    status: 'error',
+                    statusCode: 400,
+                    message: 'Password must be at least 8 characters long'
+                });
+            }
+
+            const confirmPassword = await req.body.confirmPassword;
             // confirm req.body.confirmPassword fields are not empty
             if (!confirmPassword) {
                 return res.status(400).json({
@@ -943,6 +955,13 @@ auth.changePassword = async (req, res, next) => {
                 });
             }
 
+            if (confirmPassword.length < 8) {
+                return res.status(400).json({
+                    status: 'error',
+                    statusCode: 400,
+                    message: 'Password must be at least 8 characters long'
+                });
+            }
             // Confirm new password and confirm password are same
             if (newPassword !== confirmPassword) {
                 return res.status(400).json({
@@ -951,9 +970,10 @@ auth.changePassword = async (req, res, next) => {
                     message: 'Passwords do not match'
                 });
             }
+    
 
             // if new password is same as old password return error
-            if (newPassword === user.password) {
+            if (newPassword === oldPassword) {
                 return res.status(400).json({
                     status: 'error',
                     statusCode: 400,
@@ -963,17 +983,31 @@ auth.changePassword = async (req, res, next) => {
 
             const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-            // Update user password
-            user.password = hashedPassword;
-
-            // Save Updated User
-            await user.save();
+            const updatedUser = await User.findOneAndUpdate({
+                email: decoded.email
+            }, {
+                password: hashedPassword
+            }, {
+                new: true
+            });
 
             return res.status(200).json({
                 status: 'success',
                 statusCode: 200,
                 message: 'Password changed successfully'
             });
+
+            // // Update user password
+            // user.password = hashedPassword;
+
+            // // Save Updated User
+            // await user.save();
+
+            // return res.status(200).json({
+            //     status: 'success',
+            //     statusCode: 200,
+            //     message: 'Password changed successfully'
+            // });
         });
 
     } catch (error) {
