@@ -23,7 +23,7 @@ router.post('/signupCargoOwner',
     body('phoneNumber').not().isEmpty().isMobilePhone('en-NG').withMessage('phoneNumber is invalid'),
     body('password').not().isEmpty().isLength({
         min: 6
-    }).withMessage('Password must be at least 6 characters long').toLowerCase(),
+    }).withMessage('Password must be at least 6 characters long'),
 
     authController.signupCargoOwner);
 
