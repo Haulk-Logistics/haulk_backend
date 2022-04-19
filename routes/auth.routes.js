@@ -2,30 +2,41 @@
 
 const express = require("express");
 const router = express.Router();
-const {
-    body,
-    validationResult
-} = require('express-validator');
+const validatorer = require('express-validator');
+
+
+//body validator
+const body = validatorer.body;
+
+// validationResult function
+const validationResult = validatorer.validationResult;
 
 
 // authentication controller
 const authController = require("../controllers/auth.controller");
 
 
-// signup
-router.post('/signup',
+// cargo owner signup
+router.post('/signupCargoOwner',
+
     body('email').isEmail().not().isEmpty().withMessage('email is required').toLowerCase(),
     body('phoneNumber').not().isEmpty().isMobilePhone('en-NG').withMessage('phoneNumber is invalid'),
     body('password').not().isEmpty().isLength({
         min: 6
-    }).withMessage('Password must be at least 6 characters long').toLowerCase(),
-    authController.signup);
+    }).withMessage('Password must be at least 6 characters long'),
+
+    authController.signupCargoOwner);
+
+
+// truck driver sign up
+router.post('/signupTruckDriver',
+    authController.signupTruckDriver);
+
 
 // SignIn
-router.post('/signin', 
-body('email').isEmail().withMessage('email is required').toLowerCase(),
-body('password').not().isEmpty().withMessage('password is required').toLowerCase()
-,authController.signin);
+router.post('/signin',
+    body('email').isEmail().withMessage('email is required').toLowerCase(),
+    body('password').not().isEmpty().withMessage('password is required'), authController.signin);
 
 // verify user
 router.get('/verifyUser/', authController.verifyUser);

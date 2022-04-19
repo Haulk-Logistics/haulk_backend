@@ -1,12 +1,15 @@
-const { Schema, model } = require("mongoose");
+const {
+  Schema,
+  model
+} = require("mongoose");
 
 const truckSchema = new Schema({
   truck_driver: {
     type: Schema.Types.ObjectId,
-    ref:'drivers',
+    ref: 'TruckDriver',
     required: [true, 'truck driver is required']
   },
-  truck_info: {
+  truck_type: {
     type: String,
     required: [true, 'truck type is required'],
   },
@@ -16,42 +19,52 @@ const truckSchema = new Schema({
   },
   licence_plate_number: {
     type: String,
-    required: [true, 'licence plate number']
+    required: [true, 'licence plate number image is required'],
   },
-  vehicle_license_url: {
-      type: String,
-      required: [true, 'vehicle licence is required'],
-  },
-  certificate_road: {
-      type: String,
-      required: [true, 'road certificate is required']
-  },
-  driver_license: {
-      type: String,
-      required: [true, 'driver license is required']
-  },
-  transist_goods_license: {
+  driver_license_image: {
     type: String,
-    required: [true, 'transit goods license is required']
-},
-port_psses: {
+    required: [true, 'driver license image is required']
+  },
+  vehicle_license_image: {
     type: String,
-    required: [true, 'port passes is required']
-},
+    required: [true, 'vehicle licence image is required'],
+  },
+  certificate_of_insurance_image:{
+    type: String,
+    required: [true, 'certificate of insurance image is required'],
+  },
 
-truck_image: {
+  certificate_of_road_worthiness_image: {
+    type: String,
+    required: [true, 'certificate of road worthiness image is required']
+  },
+
+  transit_goods_license_image: {
+    type: String,
+    required: [true, 'transit goods license image is required']
+  },
+
+  port_passes_image: {
+    type: String,
+    required: [true, 'port passes image is required']
+  },
+
+  truck_image: {
     type: String,
     required: [true, 'truck image is required']
-},
-driver_image: {
+  },
+
+  driver_image: {
     type: String,
     required: [true, 'driver image is required']
-},
-registered_at:{
+  },
+
+  created_at: {
     type: Date,
-    required: [true.valueOf, 'Create date is required'],
     default: Date.now()
-}
+  }
+
 });
 
-module.exports = model("Truck", truckSchema);
+const Truck = model("Truck", truckSchema);
+module.exports = Truck;

@@ -40,11 +40,11 @@ mail.sendPasswordResetEmail = async (email, token) => {
     const msg = {
         to: email,
         from: 'bezaleelnwabia@gmail.com',
-        subject: 'Reset Password',
+        subject: 'RESET PASSWORD',
         html: `
         <div>
         <p>
-        Reset your account password by clicking <a href=${`${process.env.HOSTURL}/api/auth/resetPassword/?t=${token}`}>this</a> link
+        Reset your account password by clicking <a href=${`${process.env.FRONTEND_URL}/resetPassword/?t=${token}`}>this</a> link
         </p>
         </div> 
         `,

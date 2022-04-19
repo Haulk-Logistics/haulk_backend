@@ -6,6 +6,10 @@ const book_truck_controller = {};
 const axios = require("axios");
 const { upload_image } = require("../services/cloudinary.services");
 const getDistanceFromLatLonInKm = require("../utils/calculate_distance");
+
+
+
+// Get Qoutation for a truck
 book_truck_controller.get_quotation = async (req, res) => {
   const data = req.body;
   const errors = validationResult(req);
