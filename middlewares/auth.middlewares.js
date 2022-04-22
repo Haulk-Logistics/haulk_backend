@@ -4,6 +4,7 @@ const User = require('../models/user.model');
 // Confirm User is logged in
 module.exports.isAuthorized = async (req, res, next) => {
     try {
+        console.log(req.headers)
         // The token wil  be placed in the authorization header and will have the Bearer prefix, thats why we need to split it and get the token
         const token = req.headers.authorization.split(' ')[1];
 
@@ -45,7 +46,8 @@ module.exports.isAuthorized = async (req, res, next) => {
             req.user = user;
             next();
         }
-    } catch {
+    } catch(e) {
+        console.log(e)
         res.status(500).json({
             status: 'error',
             statusCode: 500,
@@ -70,7 +72,7 @@ module.exports.isTruckDriver = async (req, res, next) => {
         }
 
         // Confirm, that the user is a truck driver
-        if (user.role === 'truckDriver') {
+        if (user.role === 'truckdriver') {
             req.user = user;
             next();
         } else {
@@ -106,7 +108,7 @@ module.exports.isCargoOwner = async (req, res, next) => {
 
 
         // Confirm, that the user is a cargo owner
-        if (user.role === 'cargoOwner') {
+        if (user.role === 'cargoowner') {
             req.user = user;
             next();
         } else {
