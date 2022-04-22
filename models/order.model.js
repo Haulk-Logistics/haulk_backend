@@ -8,7 +8,7 @@ const orderSchema = new Schema({
   transaction_id: {
     type: Schema.Types.ObjectId,
     ref: "transactions",
-    required: [true, 'transaction Id is required']
+    // required: [true, 'transaction Id is required']
   },
   nature_of_goods: {
     type: String,
@@ -52,12 +52,18 @@ const orderSchema = new Schema({
   },
   delivered_at: {
     type: Date,
-    required: [true, 'delivery date is required'],
   },
   amount: {
     type: Number,
     require: [true, 'Amount is required'],
   },
+
+  isMerged: {
+    type: String,
+    enum: ["accepted", "pending"],
+    default: "pending"
+  },
+
   order_status: {
     type: String,
     required: [true, 'order status is required'],

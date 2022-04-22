@@ -1,13 +1,12 @@
 const { validationResult } = require("express-validator");
 const formidable = require("formidable");
-const truckModel = require('../models/truck.model');
+const truckModel = require("../models/truck.model");
 const { calculate_amount } = require("../utils/calculate_amount.util");
-const book_truck_controller = {};
-const axios = require("axios");
+const OrderModel = require("../models/order.model");
 const { upload_image } = require("../services/cloudinary.services");
 const getDistanceFromLatLonInKm = require("../utils/calculate_distance");
-
-
+const releaseOrders = require("../utils/release_orders");
+const book_truck_controller = {};
 
 // Get Qoutation for a truck
 book_truck_controller.get_quotation = async (req, res) => {
@@ -61,7 +60,9 @@ book_truck_controller.make_order = async (req, res) => {
       container_number,
       shipping_line,
     } = fields;
-    const data = {
+    
+    // Create Order Object
+    const newOrder = new OrderModel({
       ordered_by: req.user._id,
       nature_of_goods,
       truck_type,
@@ -71,15 +72,20 @@ book_truck_controller.make_order = async (req, res) => {
       container_number,
       container_size,
       shipping_line,
-      url,
-    };
-    console.log(data);
+      proof_url: url,
+    });
+    // save order to database
+    const savedOrder = await newOrder.save();
+    if(savedOrder) {
+      const driver = await releaseOrders(truck_type, savedOrder._id);
+      console.log(driver);
+    }
   });
 };
 
 book_truck_controller.getDriver = async (req, res) => {
-  const trucks =  await truckModel.find();
-  console.log(trucks)
+  const trucks = await truckModel.find();
+  console.log(trucks);
 };
 
 module.exports = book_truck_controller;

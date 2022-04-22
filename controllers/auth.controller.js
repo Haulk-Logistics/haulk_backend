@@ -463,8 +463,7 @@ auth.signupTruckDriver = async (req, res, next) => {
                 role: role,
                 verified: false,
             });
-            // console.log(hashedPassword);
-            // console.log(user);
+             
 
             // Save User to user collection
             let newUser;
