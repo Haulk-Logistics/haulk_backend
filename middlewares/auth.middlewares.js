@@ -72,7 +72,7 @@ module.exports.isTruckDriver = async (req, res, next) => {
         }
 
         // Confirm, that the user is a truck driver
-        if (user.role === 'truckDriver') {
+        if (user.role === 'truckdriver') {
             req.user = user;
             next();
         } else {

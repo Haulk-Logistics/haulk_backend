@@ -65,34 +65,31 @@ book_truck_controller.make_order = async (req, res) => {
     // Create Order Object
     const newOrder = new OrderModel({
       ordered_by: req.user._id,
-      nature_of_goods:natureOfGoods,
-      truck_type:truckType,
-      drop_off_location:dropOffLocation,
-      pick_off_location:pickOffLocation,
-      pick_up_date:pickUpDate,
-      container_number:containerNumber,
-      container_size:containerSize,
-      shipping_line:shippingLine,
+      nature_of_goods: natureOfGoods,
+      truck_type: truckType,
+      drop_off_location: dropOffLocation,
+      pick_off_location: pickOffLocation,
+      pick_up_date: pickUpDate,
+      container_number: containerNumber,
+      container_size: containerSize,
+      shipping_line: shippingLine,
       proof_url: url,
     });
     // save order to database
     const savedOrder = await newOrder.save();
     if (savedOrder) {
-      const newopenOrder = new OpenOrder({ openOrder: savedOrder._id });
-      const savedOpenOrder = await newopenOrder.save();
-      if(savedOpenOrder) {
-        res.status(200).json({
-          status: "success",
-          statuscode: 200,
-          message: "Your order has been made available to the drivers, wait shortly for a driver response",
-        });
-      }else {
-        res.status(500).json({
-          status: "error",
-          statuscode: 500,
-          message: "can't make open Order",
-        });
-      }
+      res.status(200).json({
+        status: "success",
+        statuscode: 200,
+        message:
+          "Your order has been made available to the drivers, wait shortly for a driver response",
+      });
+    } else {
+      res.status(500).json({
+        status: "error",
+        statuscode: 500,
+        message: "can't make open Order",
+      });
     }
   });
 };
