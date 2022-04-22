@@ -18,8 +18,8 @@ $ npm run prod
 
 ## Technologies
 
-- Node Js
-- Express Js
+- Node.Js
+- Express.Js
 - Monogo DataBase (mongoose)
 
 ----------------------------------------------------------

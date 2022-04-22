@@ -15,8 +15,8 @@ const databaseUrl = process.env.MONGOURL;
 
 // routes
 const auth = require('./routes/auth.routes');
-const admin = require('./routes/admin.routes');
-const bookAtruck = require("./routes/api/v1/book_truck.routes");
+const admin = require('./routes/admin_owner_routes/admin.routes');
+const bookAtruck = require("./routes/cargo_owner_routes/book_truck.routes");
 
 
 // Middlewares
