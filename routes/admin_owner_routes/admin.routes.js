@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 // admin controller
-const adminController = require("../controllers/admin.controller");
+const adminController = require("../../controllers/admin.controller");
 
 // Admin Signup
 router.post("/auth/signup", adminController.signup);
