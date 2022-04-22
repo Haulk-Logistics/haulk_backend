@@ -17,5 +17,7 @@ router.post("/auth/signin", adminController.signIn);
 // router.get("/getAllAdmins", adminController.getAllAdmins);
 
 
+// Delete a truck driver account
 
+// Delete a cargo owner account
 module.exports = router;
