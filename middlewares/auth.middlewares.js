@@ -108,7 +108,7 @@ module.exports.isCargoOwner = async (req, res, next) => {
 
 
         // Confirm, that the user is a cargo owner
-        if (user.role === 'cargoOwner') {
+        if (user.role === 'cargoowner') {
             req.user = user;
             next();
         } else {

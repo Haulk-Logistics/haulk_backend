@@ -554,7 +554,7 @@ auth.signupTruckDriver = async (req, res, next) => {
         });
     }
 
-}
+};
 
 
 

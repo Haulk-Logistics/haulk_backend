@@ -5,7 +5,7 @@ const { calculate_amount } = require("../utils/calculate_amount.util");
 const OrderModel = require("../models/order.model");
 const { upload_image } = require("../services/cloudinary.services");
 const getDistanceFromLatLonInKm = require("../utils/calculate_distance");
-const releaseOrders = require("../utils/release_orders");
+const OpenOrder = require("../models/open_order.model");
 const book_truck_controller = {};
 
 // Get Qoutation for a truck
@@ -38,6 +38,7 @@ book_truck_controller.get_quotation = async (req, res) => {
   }
 };
 
+// Make Order
 book_truck_controller.make_order = async (req, res) => {
   const form = new formidable.IncomingForm();
   form.parse(req, async function (err, fields, files) {
@@ -51,34 +52,47 @@ book_truck_controller.make_order = async (req, res) => {
       console.log("No path inputed");
     }
     const {
-      nature_of_goods,
-      truck_type,
-      drop_off_location,
-      pick_off_location,
-      pick_up_date,
-      container_size,
-      container_number,
-      shipping_line,
+      natureOfGoods,
+      truckType,
+      dropOffLocation,
+      pickOffLocation,
+      pickUpDate,
+      containerSize,
+      containerNumber,
+      shippingLine,
     } = fields;
-    
+
     // Create Order Object
     const newOrder = new OrderModel({
       ordered_by: req.user._id,
-      nature_of_goods,
-      truck_type,
-      drop_off_location,
-      pick_off_location,
-      pick_up_date,
-      container_number,
-      container_size,
-      shipping_line,
+      nature_of_goods:natureOfGoods,
+      truck_type:truckType,
+      drop_off_location:dropOffLocation,
+      pick_off_location:pickOffLocation,
+      pick_up_date:pickUpDate,
+      container_number:containerNumber,
+      container_size:containerSize,
+      shipping_line:shippingLine,
       proof_url: url,
     });
     // save order to database
     const savedOrder = await newOrder.save();
-    if(savedOrder) {
-      const driver = await releaseOrders(truck_type, savedOrder._id);
-      console.log(driver);
+    if (savedOrder) {
+      const newopenOrder = new OpenOrder({ openOrder: savedOrder._id });
+      const savedOpenOrder = await newopenOrder.save();
+      if(savedOpenOrder) {
+        res.status(200).json({
+          status: "success",
+          statuscode: 200,
+          message: "Your order has been made available to the drivers, wait shortly for a driver response",
+        });
+      }else {
+        res.status(500).json({
+          status: "error",
+          statuscode: 500,
+          message: "can't make open Order",
+        });
+      }
     }
   });
 };

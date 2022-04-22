@@ -15,8 +15,9 @@ const databaseUrl = process.env.MONGOURL;
 
 // routes
 const auth = require('./routes/auth.routes');
-const admin = require('./routes/admin.routes');
-const bookAtruck = require("./routes/api/v1/book_truck.routes");
+const admin = require('./routes/admin_owner_routes/admin.routes');
+const truckDriver = require('./routes/truck_driver_routes/driver.route');
+const bookAtruck = require("./routes/cargo_owner_routes/book_truck.routes");
 
 
 // Middlewares
@@ -63,6 +64,9 @@ app.use("/api/auth", auth);
 
 // Booking Truck route
 app.use("/api/", bookAtruck);
+
+// Truckdriver routes
+app.use('/api/driver/', truckDriver)
 
 // handle undefined Routes
 app.use("*", (req, res, next) => {

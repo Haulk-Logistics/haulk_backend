@@ -1,7 +1,7 @@
 const driverController = {};
 
-driverController.seeOrders = (req,res) => {
-    
+driverController.seeOpenOrders = (req,res) => {
+       console.log(req.user);
 }
 
 module.exports = driverController;

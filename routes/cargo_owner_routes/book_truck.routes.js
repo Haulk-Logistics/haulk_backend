@@ -4,8 +4,8 @@ const {
   get_quotation,
   make_order,
   getDriver
-} = require("../../../controllers/book_truck.controllers");
-const { isAuthorized } = require("../../../middlewares/auth.middlewares");
+} = require("../../controllers/book_truck.controllers");
+const { isAuthorized, isCargoOwner } = require("../../middlewares/auth.middlewares");
 // Router
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.post(
 );
 
 //  booking a truck and make payment for the truck
-router.post("/book_a_truck", isAuthorized, make_order);
+router.post("/book_a_truck", isAuthorized, isCargoOwner, make_order);
 
 router.get('/getter', isAuthorized, getDriver)
 

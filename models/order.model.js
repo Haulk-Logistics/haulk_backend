@@ -58,12 +58,6 @@ const orderSchema = new Schema({
     require: [true, 'Amount is required'],
   },
 
-  isMerged: {
-    type: String,
-    enum: ["accepted", "pending"],
-    default: "pending"
-  },
-
   order_status: {
     type: String,
     required: [true, 'order status is required'],
