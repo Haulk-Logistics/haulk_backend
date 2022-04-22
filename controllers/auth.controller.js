@@ -746,11 +746,13 @@ auth.verifyUser = async (req, res, next) => {
             }
             user.verified = true;
             await user.save();
-            return res.status(200).json({
-                status: 'success',
-                statusCode: 200,
-                message: 'User verified successfully'
-            });
+            // return res.status(200).json({
+            //     status: 'success',
+            //     statusCode: 200,
+            //     message: 'User verified successfully'
+            // });
+
+            return res.redirect(301, `${process.env.FRONTEND_URL}/verified`);
 
         });
 
@@ -969,7 +971,7 @@ auth.changePassword = async (req, res, next) => {
                     message: 'Passwords do not match'
                 });
             }
-    
+
 
             // if new password is same as old password return error
             if (newPassword === oldPassword) {
