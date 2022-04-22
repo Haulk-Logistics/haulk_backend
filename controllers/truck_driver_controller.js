@@ -44,7 +44,7 @@ driverController.acceptOrder = async (req, res) => {
   const { id } = req.params;
   // returns id which this pariticular order id
   try {
-    //     if user has an order don't accept another order
+    //   if user has an order don't accept another order
     const driver = await Driver.findOne({ userDetails: req.user._id });
     if (driver && driver.orders.length > 0) {
       return res.status(500).json({
