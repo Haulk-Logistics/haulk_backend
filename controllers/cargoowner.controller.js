@@ -3,7 +3,7 @@ const Order = require('../models/order.model');
 
 cargoOwnwer.getOrderHistory = async (req,res) => {
   try {
-    const orders = await Order.find({order_status: 'dropped_off'});
+    const orders = await Order.find({ordered_by:req.user._id ,order_status: 'dropped_off'});
     if(orders && orders.length > 0) {
         res.status(200).send({
             statuscode: 200,
