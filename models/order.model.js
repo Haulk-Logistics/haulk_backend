@@ -61,7 +61,7 @@ const orderSchema = new Schema({
   order_status: {
     type: String,
     required: [true, 'order status is required'],
-    enum: ["pending", "accepted", "delivered"],
+    enum: ["pending", "accepted", "picked_up", "in_transit", "dropped_off"],
     default: "pending",
   },
 });

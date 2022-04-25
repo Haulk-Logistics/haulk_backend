@@ -2,9 +2,8 @@ const express = require("express");
 const { body } = require("express-validator");
 const {
   get_quotation,
-  make_order,
-  getDriver
-} = require("../../controllers/book_truck.controllers");
+  make_order
+} = require("../../controllers/book_a_truck.controller");
 const { isAuthorized, isCargoOwner } = require("../../middlewares/auth.middlewares");
 // Router
 const router = express.Router();
@@ -21,7 +20,4 @@ router.post(
 
 //  booking a truck and make payment for the truck
 router.post("/book_a_truck", isAuthorized, isCargoOwner, make_order);
-
-router.get('/getter', isAuthorized, getDriver)
-
 module.exports = router;

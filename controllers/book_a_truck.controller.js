@@ -5,7 +5,6 @@ const { calculate_amount } = require("../utils/calculate_amount.util");
 const OrderModel = require("../models/order.model");
 const { upload_image } = require("../services/cloudinary.services");
 const getDistanceFromLatLonInKm = require("../utils/calculate_distance");
-const OpenOrder = require("../models/open_order.model");
 const book_truck_controller = {};
 
 // Get Qoutation for a truck
@@ -94,9 +93,7 @@ book_truck_controller.make_order = async (req, res) => {
   });
 };
 
-book_truck_controller.getDriver = async (req, res) => {
-  const trucks = await truckModel.find();
-  console.log(trucks);
-};
+// retruns cargoowner order history
+
 
 module.exports = book_truck_controller;
