@@ -10,6 +10,11 @@ const orderSchema = new Schema({
     ref: "transactions",
     // required: [true, 'transaction Id is required']
   },
+  truck_driver:{
+    type: Schema.Types.ObjectId,
+    ref: "truckdriver",
+    default: null
+  },
   nature_of_goods: {
     type: String,
     required: [true, 'natrue of good is required'],
