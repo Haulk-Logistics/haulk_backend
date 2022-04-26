@@ -32,6 +32,7 @@ cargoOwnwer.getOrderHistory = async (req, res) => {
 };
 
 cargoOwnwer.getActiveOrder = async (req, res) => {
+  
   try {
     const orders = await Order.find({
       ordered_by: req.user._id,
