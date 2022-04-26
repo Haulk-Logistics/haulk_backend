@@ -48,7 +48,7 @@ const userSchema = new Schema({
     password: {
 
         type: String,
-        // select: false,
+        select: false,
         required: true,
         min: 6
     },
