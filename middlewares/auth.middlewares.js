@@ -4,11 +4,16 @@ const User = require('../models/user.model');
 // Confirm User is logged in
 module.exports.isAuthorized = async (req, res, next) => {
     try {
-        console.log(req.headers)
-        // The token wil  be placed in the authorization header and will have the Bearer prefix, thats why we need to split it and get the token
-        const token = req.headers.authorization.split(' ')[1];
-
         // Confitm, that the tokKEN IS IN THE HEADER
+        // The token wil  be placed in the authorization header and will have the Bearer prefix, thats why we need to split it and get the token
+        if (!req.headers.authorization) {
+            return res.status(401).send({
+                statuscode: 401,
+                status: 'error',
+                message: 'No token provided'
+            });
+        }
+        const token = await req.headers.authorization.split(' ')[1];
         if (token === undefined) {
             return res.status(404).json({
                 status: 'error',
@@ -17,9 +22,9 @@ module.exports.isAuthorized = async (req, res, next) => {
             });
         }
 
-        console.log(token);
 
-        const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+
+        const decodedToken =await jwt.verify(token, process.env.TOKEN_SECRET);
 
         // cofirm that the token is valid
         if (!decodedToken) {

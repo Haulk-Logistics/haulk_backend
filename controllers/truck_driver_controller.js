@@ -24,9 +24,9 @@ driverController.seeOpenOrders = async (req, res) => {
         message: orders,
       });
     } else {
-      res.status(500).json({
+      res.status(200).json({
         status: "error",
-        statuscode: 500,
+        statuscode: 200,
         message: "There is no order open for you",
       });
     }
