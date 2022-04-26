@@ -4,7 +4,7 @@ const Orders = require("../models/order.model");
 
 const driverController = {};
 
-// Route to see open orders
+// route to see open orders
 driverController.seeOpenOrders = async (req, res) => {
   const { _id } = req.user;
   try {
@@ -39,7 +39,7 @@ driverController.seeOpenOrders = async (req, res) => {
   }
 };
 
-// Route to accept orders
+// route to accept orders
 driverController.acceptOrder = async (req, res) => {
   const { id } = req.params;
   // returns id which this pariticular order id
@@ -87,5 +87,17 @@ driverController.acceptOrder = async (req, res) => {
     });
   }
 };
+
+// route to view driver profile
+driverController.viewProfile = async (req, res) => {};
+
+// route to view driver active orders
+driverController.activeOrder = async (req,res) => {
+  const activeOrders =  await Driver.find().populate('userDetails');
+  res.send(activeOrders)
+};
+
+// route to view order history
+driverController.orderHistory = async (req,res) => {};
 
 module.exports = driverController;

@@ -93,7 +93,4 @@ book_truck_controller.make_order = async (req, res) => {
   });
 };
 
-// retruns cargoowner order history
-
-
 module.exports = book_truck_controller;

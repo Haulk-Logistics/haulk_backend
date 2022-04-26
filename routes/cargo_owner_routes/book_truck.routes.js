@@ -1,6 +1,6 @@
 const express = require("express");
 const { body } = require("express-validator");
-const {
+const { 
   get_quotation,
   make_order
 } = require("../../controllers/book_a_truck.controller");
