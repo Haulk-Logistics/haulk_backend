@@ -24,9 +24,9 @@ driverController.seeOpenOrders = async (req, res) => {
         message: orders,
       });
     } else {
-      res.status(200).json({
+      res.status(500).json({
         status: "error",
-        statuscode: 200,
+        statuscode: 500,
         message: "There is no order open for you",
       });
     }
@@ -92,12 +92,31 @@ driverController.acceptOrder = async (req, res) => {
 driverController.viewProfile = async (req, res) => {};
 
 // route to view driver active orders
-driverController.activeOrder = async (req,res) => {
-  const activeOrders =  await Driver.find().populate('userDetails');
-  res.send(activeOrders)
+driverController.activeOrder = async (req, res) => {
+  try {
+    // retruns all orders
+    const allOrders = await Driver.find({ userDetails: req.user._id }).populate(
+      {
+        path: "orders",
+        match: { order_status: { $ne: "dropped_off" } },
+      }
+    );
+    // retruns orders where status != dropped_off
+    res.status(200).send({
+      statuscode: 200,
+      status: "success",
+      message: allOrders,
+    });
+  } catch (e) {
+    res.status(500).send({
+      statuscode: 500,
+      status: "error",
+      message: "Error retrieving active orders",
+    });
+  }
 };
 
 // route to view order history
-driverController.orderHistory = async (req,res) => {};
+driverController.orderHistory = async (req, res) => {};
 
 module.exports = driverController;
