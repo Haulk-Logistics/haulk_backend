@@ -109,7 +109,7 @@ driverController.activeOrder = async (req, res) => {
     res.status(500).send({
       statuscode: 500,
       status: "error",
-      message: "Error retrieving active order",
+      message: "Error returning active order",
     });
   }
 };
