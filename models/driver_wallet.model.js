@@ -3,17 +3,17 @@ const {
     Schema
 } = mongoose;
 
-const driverWalletSchema = new Schema({
-    driverBalance: {
+const WalletSchema = new Schema({
+    currentBalance: {
         type: Number,
         default: 0
     },
-    withdrawableDriverBalance: {
+    withdrawableBalance: {
         type: Number,
         default: 0
     },
 });
 
 
-const DriverWallet = mongoose.model('DriverWallet', driverWalletSchema);
-module.exports = DriverWallet;
+const Wallet = mongoose.model('Wallet', WalletSchema);
+module.exports = Wallet;
