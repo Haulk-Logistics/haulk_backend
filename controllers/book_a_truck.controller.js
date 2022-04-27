@@ -254,7 +254,7 @@ book_truck_controller.initialize_payment = async (req, res) => {
       });
 
       // save order to database
-     await newOrder.save();
+      await newOrder.save();
 
       // res.status(200).json({
       //   status: "success",
@@ -264,11 +264,15 @@ book_truck_controller.initialize_payment = async (req, res) => {
       // });
 
 
-      // res.status(200).json({
-      //   data: response,
-      // }); 
+      res.status(200).json({
+        authorization_url: response.data.authorization_url,
+      }); 
+      // Redirect to Paystack Payment Page
+      // res.redirect(response.data.authorization_url);
 
-      res.redirect(response.data.authorization_url);
+
+
+
     });
   });
 };
@@ -286,7 +290,7 @@ book_truck_controller.verify_payment = async (req, res) => {
       message: "Payment reference is required",
     });
   }
-  
+
   paystack.verifyPayment(reference, async (error, body) => {
     if (error) {
       //handle errors
@@ -298,7 +302,7 @@ book_truck_controller.verify_payment = async (req, res) => {
       });
     }
     response = JSON.parse(body);
-    if(!response){
+    if (!response) {
       return res.status(500).json({
         status: "error",
         statuscode: 500,
@@ -346,7 +350,7 @@ book_truck_controller.verify_payment = async (req, res) => {
         transaction_id: transaction._id
       });
       // order.order_status = "pending";
-      
+
       await order.save();
       await transaction.save();
 
