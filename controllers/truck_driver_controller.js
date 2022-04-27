@@ -88,6 +88,27 @@ driverController.acceptOrder = async (req, res) => {
   }
 };
 
+// route to view driver profile
+driverController.viewProfile = async (req, res) => {
+  try {
+    // retruns all orders
+    const driverProfile = await Driver.find({
+      userDetails: req.user._id,
+    }).populate("userDetails").populate('truckDetails');
+    // retruns orders where status != dropped_off
+    res.status(200).send({
+      statuscode: 200,
+      status: "success",
+      message: driverProfile,
+    });
+  } catch (e) {
+    res.status(500).send({
+      statuscode: 500,
+      status: "error",
+      message: "Error retrieving driver's profile",
+    });
+  }
+};
 
 // route to view driver active orders
 driverController.activeOrder = async (req, res) => {
@@ -109,7 +130,7 @@ driverController.activeOrder = async (req, res) => {
     res.status(500).send({
       statuscode: 500,
       status: "error",
-      message: "Error returning active order",
+      message: "Error retrieving active order",
     });
   }
 };
