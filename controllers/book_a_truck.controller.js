@@ -281,7 +281,7 @@ book_truck_controller.initialize_payment = async (req, res) => {
 book_truck_controller.verify_payment = async (req, res) => {
   const {
     reference
-  } = req.body;
+  } = req.query;
 
   if (!reference) {
     return res.status(400).json({
