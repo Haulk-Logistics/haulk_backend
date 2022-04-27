@@ -15,7 +15,7 @@ driverController.seeOpenOrders = async (req, res) => {
       driverTruckDetails && driverTruckDetails.truckDetails;
     const orders = await Orders.find({
       truck_type: truck_type,
-      order_status: "pending",
+      order_status: "processing",
     });
     if (orders.length > 0) {
       res.status(200).json({
@@ -45,8 +45,9 @@ driverController.acceptOrder = async (req, res) => {
   // returns id which this pariticular order id
   try {
     //   if user has an order don't accept another order
-    const driver = await Driver.findOne({ userDetails: req.user._id });
-    if (driver && driver.orders.length > 0) {
+    const driver = await Driver.findOne({ userDetails: req.user._id }).populate('orders');
+    const hasOrder = driver &&  driver.orders.findIndex(x => x.order_status !== "dropped_off");
+    if (hasOrder !== -1) {
       return res.status(500).json({
         status: "error",
         statuscode: 500,
@@ -64,6 +65,7 @@ driverController.acceptOrder = async (req, res) => {
     }
     //     updates the order status to active
     order.order_status = "accepted";
+    order.truck_driver = req.user._id;
     //     saves updated order status
     const accepted_order = await order.save();
     //     find driver who want's to accept order and insert accepted order into the order array
@@ -94,7 +96,9 @@ driverController.viewProfile = async (req, res) => {
     // retruns all orders
     const driverProfile = await Driver.find({
       userDetails: req.user._id,
-    }).populate("userDetails").populate('truckDetails');
+    })
+      .populate("userDetails")
+      .populate("truckDetails");
     // retruns orders where status != dropped_off
     res.status(200).send({
       statuscode: 200,
@@ -112,9 +116,28 @@ driverController.viewProfile = async (req, res) => {
 
 // route to view driver active orders
 driverController.activeOrder = async (req, res) => {
-  const orders = await Orders.find();
-  res.send(orders);
-}
+  try {
+    // retruns all orders
+    const orderHistory = await Driver.find({
+      userDetails: req.user._id,
+    }).populate({
+      path: "orders",
+      match: { order_status: { $ne: "dropped_off" } },
+    });
+    // retruns orders where status != dropped_off
+    res.status(200).send({
+      statuscode: 200,
+      status: "success",
+      message: orderHistory,
+    });
+  } catch (e) {
+    res.status(500).send({
+      statuscode: 500,
+      status: "error",
+      message: "Error retrieving order history",
+    });
+  }
+};
 
 // route to view order history
 driverController.orderHistory = async (req, res) => {

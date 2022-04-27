@@ -31,8 +31,35 @@ cargoOwnwer.getOrderHistory = async (req, res) => {
   }
 };
 
+cargoOwnwer.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({
+      ordered_by: req.user._id,
+    });
+    if (orders && orders.length > 0) {
+      res.status(200).send({
+        statuscode: 200,
+        status: "success",
+        message: orders,
+      });
+    } else if (orders && orders.length === 0) {
+      res.status(200).send({
+        statuscode: 200,
+        status: "success",
+        message: "You do not have any order",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(401).send({
+      statuscode: 200,
+      status: "error",
+      message: "Error retrieving your orders",
+    });
+  }
+};
+
 cargoOwnwer.getActiveOrder = async (req, res) => {
-  
   try {
     const orders = await Order.find({
       ordered_by: req.user._id,
