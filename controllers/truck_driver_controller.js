@@ -112,28 +112,9 @@ driverController.viewProfile = async (req, res) => {
 
 // route to view driver active orders
 driverController.activeOrder = async (req, res) => {
-  try {
-    // retruns all orders
-    const activeOrder = await Driver.find({
-      userDetails: req.user._id,
-    }).populate({
-      path: "orders",
-      match: { order_status: { $ne: "dropped_off" } },
-    });
-    // retruns orders where status != dropped_off
-    res.status(200).send({
-      statuscode: 200,
-      status: "success",
-      message: activeOrder,
-    });
-  } catch (e) {
-    res.status(500).send({
-      statuscode: 500,
-      status: "error",
-      message: "Error retrieving active order",
-    });
-  }
-};
+  const orders = await Orders.find();
+  res.send(orders);
+}
 
 // route to view order history
 driverController.orderHistory = async (req, res) => {
