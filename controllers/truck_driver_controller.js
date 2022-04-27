@@ -88,35 +88,55 @@ driverController.acceptOrder = async (req, res) => {
   }
 };
 
-// route to view driver profile
-driverController.viewProfile = async (req, res) => {};
 
 // route to view driver active orders
 driverController.activeOrder = async (req, res) => {
   try {
     // retruns all orders
-    const allOrders = await Driver.find({ userDetails: req.user._id }).populate(
-      {
-        path: "orders",
-        match: { order_status: { $ne: "dropped_off" } },
-      }
-    );
+    const activeOrder = await Driver.find({
+      userDetails: req.user._id,
+    }).populate({
+      path: "orders",
+      match: { order_status: { $ne: "dropped_off" } },
+    });
     // retruns orders where status != dropped_off
     res.status(200).send({
       statuscode: 200,
       status: "success",
-      message: allOrders,
+      message: activeOrder,
     });
   } catch (e) {
     res.status(500).send({
       statuscode: 500,
       status: "error",
-      message: "Error retrieving active orders",
+      message: "Error retrieving active order",
     });
   }
 };
 
 // route to view order history
-driverController.orderHistory = async (req, res) => {};
+driverController.orderHistory = async (req, res) => {
+  try {
+    // retruns all orders
+    const orderHistory = await Driver.find({
+      userDetails: req.user._id,
+    }).populate({
+      path: "orders",
+      match: { order_status: "dropped_off" },
+    });
+    // retruns orders where status != dropped_off
+    res.status(200).send({
+      statuscode: 200,
+      status: "success",
+      message: orderHistory,
+    });
+  } catch (e) {
+    res.status(500).send({
+      statuscode: 500,
+      status: "error",
+      message: "Error retrieving order history",
+    });
+  }
+};
 
 module.exports = driverController;
