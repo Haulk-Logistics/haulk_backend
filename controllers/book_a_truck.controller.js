@@ -267,8 +267,12 @@ book_truck_controller.initialize_payment = async (req, res) => {
       // res.status(200).json({
       //   data: response,
       // }); 
+      // Redirect to Paystack Payment Page
+      res.redirect(response.data.authorization_url);
+      
 
-      return res.redirect(response.data.authorization_url);
+
+
     });
   });
 };
