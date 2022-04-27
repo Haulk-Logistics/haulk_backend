@@ -5,9 +5,10 @@ const orderSchema = new Schema({
     ref: "cargoowner",
     required: [true, 'user id is required']
   },
-  transaction_id: {
-    type: Schema.Types.ObjectId,
-    ref: "transactions",
+  transaction_ref: {
+    type: String,
+    default: 'paypending',
+    // ref: "transactions",
     // required: [true, 'transaction Id is required']
   },
   truck_driver:{
@@ -62,12 +63,11 @@ const orderSchema = new Schema({
     type: Number,
     require: [true, 'Amount is required'],
   },
-
   order_status: {
     type: String,
     required: [true, 'order status is required'],
-    enum: ["pending", "accepted", "picked_up", "in_transit", "dropped_off"],
-    default: "pending",
+    enum: ["processing","pending", "accepted", "picked_up", "in_transit", "dropped_off"],
+    default: "processing",
   },
 });
 
