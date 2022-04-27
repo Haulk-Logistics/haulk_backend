@@ -18,7 +18,7 @@ const transactionSchema = new Schema({
     transaction_id: {
         type: String,
         default: haulk_uid.v2(),
-        unique: true
+        // unique: true
     },
     //TRANSACTION TYPE
     transactionType: {
@@ -41,11 +41,11 @@ const transactionSchema = new Schema({
     },
 
     //TRANSACTION STATUS
-    // transactionStatus: {
-    //     type: String,
-    //     required: true,
-    //     enum: ["pending", "completed"],
-    // },
+    transactionStatus: {
+        type: String,
+        required: true,
+        enum: ["pending", "completed"],
+    },
 
     //TRANSACTION DESCRIPTION
     transactionDescription: {
@@ -57,7 +57,8 @@ const transactionSchema = new Schema({
     //TRANSACTION REFERENCE
     transactionReference: {
         type: String,
-        unique: true,
+        // unique: true,
+        default: haulk_uid.v2(),
     },
 
 });
