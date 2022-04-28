@@ -21,6 +21,7 @@ router.get(
   cargoOwnerController.getActiveOrder
 );
 
+
 // cargoowner all orders route
 router.get(
   "/all_orders",
@@ -28,6 +29,15 @@ router.get(
   isCargoOwner,
   cargoOwnerController.getAllOrders
 );
+
+//  get specific cargoowner order
+router.get(
+  "/order/:id",
+  isAuthorized,
+  isCargoOwner,
+  cargoOwnerController.getEachOrder
+);
+
 
 // cargowner view profile route
 router.get(

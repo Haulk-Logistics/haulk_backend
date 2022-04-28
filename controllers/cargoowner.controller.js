@@ -110,4 +110,28 @@ cargoOwnwer.getProfile = async (req, res) => {
   }
 };
 
+cargoOwnwer.getEachOrder = async (req, res) => {
+  const { id } = req.params
+  try {
+    const order = await Order.findOne({
+      ordered_by: req.user._id,
+      _id: id
+    }).populate("truck_driver");
+    if (order) {
+      res.status(200).send({
+        statuscode: 200,
+        status: "success",
+        message: order,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(401).send({
+      statuscode: 200,
+      status: "error",
+      message: "Error retrieving your  order",
+    });
+  }
+}
+
 module.exports = cargoOwnwer;

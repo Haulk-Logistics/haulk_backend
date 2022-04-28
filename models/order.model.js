@@ -13,7 +13,7 @@ const orderSchema = new Schema({
   },
   truck_driver:{
     type: Schema.Types.ObjectId,
-    ref: "TruckDriver",
+    ref: "User",
     default: null
   },
   nature_of_goods: {

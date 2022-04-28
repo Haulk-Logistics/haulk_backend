@@ -15,7 +15,7 @@ driverController.seeOpenOrders = async (req, res) => {
       driverTruckDetails && driverTruckDetails.truckDetails;
     const orders = await Orders.find({
       truck_type: truck_type,
-      order_status: "processing",
+      order_status: "pending",
     });
     if (orders.length > 0) {
       res.status(200).json({
