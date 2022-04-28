@@ -256,15 +256,6 @@ book_truck_controller.initialize_payment = async (req, res) => {
 
       // save order to database
       await newOrder.save();
-
-      // res.status(200).json({
-      //   status: "success",
-      //   statuscode: 200,
-      //   message: "Your order has been made available to the drivers, wait shortly for a driver response",
-      //   data: savedOrder,
-      // });
-
-
       res.status(200).json({
         authorization_url: response.data.authorization_url,
       }); 
