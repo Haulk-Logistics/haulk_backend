@@ -13,7 +13,7 @@ const orderSchema = new Schema({
   },
   truck_driver:{
     type: Schema.Types.ObjectId,
-    ref: "truckdriver",
+    ref: "User",
     default: null
   },
   nature_of_goods: {
@@ -61,7 +61,8 @@ const orderSchema = new Schema({
   },
   amount: {
     type: Number,
-    require: [true, 'Amount is required'],
+    default: 0,
+    required: [true, 'Amount is required'],
   },
   order_status: {
     type: String,

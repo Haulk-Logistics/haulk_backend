@@ -22,6 +22,7 @@ const {
 } = require("../services/cloudinary.services");
 const getDistanceFromLatLonInKm = require("../utils/calculate_distance");
 const paystack = require("../services/paystack.services");
+// const { response } = require("express");
 const book_truck_controller = {};
 
 // Get Qoutation for a truck
@@ -220,7 +221,7 @@ book_truck_controller.initialize_payment = async (req, res) => {
           message: "Server couldn't process payment. Please try again if error persists , please contact 'support@haulk.com' ",
         });
       }
-      response = JSON.parse(body);
+     const response = JSON.parse(body);
 
       console.log(response);
 
@@ -240,6 +241,7 @@ book_truck_controller.initialize_payment = async (req, res) => {
       // Create Order Object
       const newOrder = await new OrderModel({
         ordered_by: user._id,
+        amount: savedTransaction.amount,
         transaction_id: savedTransaction._id,
         order_status: "processing",
         nature_of_goods: natureOfGoods,
@@ -254,21 +256,16 @@ book_truck_controller.initialize_payment = async (req, res) => {
       });
 
       // save order to database
-     await newOrder.save();
-
-      // res.status(200).json({
-      //   status: "success",
-      //   statuscode: 200,
-      //   message: "Your order has been made available to the drivers, wait shortly for a driver response",
-      //   data: savedOrder,
-      // });
+      await newOrder.save();
+      res.status(200).json({
+        authorization_url: response.data.authorization_url,
+      }); 
+      // Redirect to Paystack Payment Page
+      // res.redirect(response.data.authorization_url);
 
 
-      // res.status(200).json({
-      //   data: response,
-      // }); 
 
-      res.redirect(response.data.authorization_url);
+
     });
   });
 };
@@ -277,16 +274,18 @@ book_truck_controller.initialize_payment = async (req, res) => {
 book_truck_controller.verify_payment = async (req, res) => {
   const {
     reference
-  } = req.query;
+  } = req.body;
+
+  // console.log(reference);
 
   if (!reference) {
     return res.status(400).json({
       status: "error",
       statuscode: 400,
-      message: "Payment reference is required",
+      message: "Payment reference is required, Add it to your request body",
     });
   }
-  
+
   paystack.verifyPayment(reference, async (error, body) => {
     if (error) {
       //handle errors
@@ -297,8 +296,8 @@ book_truck_controller.verify_payment = async (req, res) => {
         message: "Server couldn't process payment. Please try again if error persists , please contact ",
       });
     }
-    response = JSON.parse(body);
-    if(!response){
+    const response = JSON.parse(body);
+    if (!response) {
       return res.status(500).json({
         status: "error",
         statuscode: 500,
@@ -306,13 +305,23 @@ book_truck_controller.verify_payment = async (req, res) => {
       });
     }
 
-    console.log(response);
-
+    // console.log(response);
     if (response.data.status === "success") {
       // Update Transaction Status
       const transaction = await TransactionModel.findOne({
         transactionReference: reference
       });
+
+      if (!transaction) {
+        return res.status(400).json({
+          status: "error",
+          statuscode: 400,
+          message: "Transaction not found",
+        });
+      }
+
+
+      console.log(transaction);
       transaction.transactionStatus = "completed";
       // transaction.transactionReference = response.data.reference;
       const savedTransaction = await transaction.save();
@@ -321,6 +330,7 @@ book_truck_controller.verify_payment = async (req, res) => {
       const order = await OrderModel.findOne({
         transaction_id: savedTransaction._id
       });
+      order.transaction_ref = await savedTransaction.transactionReference;
       order.order_status = "pending";
       const savedOrder = await order.save();
 
@@ -334,7 +344,20 @@ book_truck_controller.verify_payment = async (req, res) => {
         },
       });
       // res.redirect('/');
-    } else {
+    } else if(response.data.status === "failed") { 
+      // confirm reference number exist
+      const verifyRefNo = await TransactionModel.findOne({
+        transactionReference: reference
+      });
+      if (!verifyRefNo) {
+        return res.status(400).json({
+          status: "error",
+          statuscode: 400,
+          message: "Payment reference not found",
+        });
+      }
+
+      // Update Transaction Status
       const transaction = await TransactionModel.findOneAndDelete({
         transactionReference: reference
       });
@@ -346,10 +369,16 @@ book_truck_controller.verify_payment = async (req, res) => {
         transaction_id: transaction._id
       });
       // order.order_status = "pending";
-      
+
       await order.save();
       await transaction.save();
 
+      res.status(400).json({
+        status: "error",
+        statuscode: 400,
+        message: "Payment Failed, Please try again, if error persists or you were debited, please contact your ATM card issuer",
+      });
+    } else{
       res.status(400).json({
         status: "error",
         statuscode: 400,

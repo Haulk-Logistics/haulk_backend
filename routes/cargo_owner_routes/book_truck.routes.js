@@ -20,5 +20,5 @@ router.post(
 // Initialize Paystack Payment
 router.post("/book_a_truck/initialize_payment", isAuthorized, isCargoOwner,bookATruck.initialize_payment );
 
-router.put("/book_a_truck/verify_payment", isAuthorized, isCargoOwner,bookATruck.verify_payment);
+router.get("/book_a_truck/verify_payment", isAuthorized, isCargoOwner,bookATruck.verify_payment);
 module.exports = router;
