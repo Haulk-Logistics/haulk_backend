@@ -282,7 +282,7 @@ book_truck_controller.initialize_payment = async (req, res) => {
 book_truck_controller.verify_payment = async (req, res) => {
   const {
     reference
-  } = req.query;
+  } = req.body;
 
   console.log(reference);
 
@@ -290,7 +290,7 @@ book_truck_controller.verify_payment = async (req, res) => {
     return res.status(400).json({
       status: "error",
       statuscode: 400,
-      message: "Payment reference is required",
+      message: "Payment reference is required, Add it to your request body",
     });
   }
 
