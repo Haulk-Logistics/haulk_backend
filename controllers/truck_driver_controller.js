@@ -6,13 +6,20 @@ const driverController = {};
 
 // route to see open orders
 driverController.seeOpenOrders = async (req, res) => {
-  const { _id } = req.user;
+  const {
+    _id
+  } = req.user;
   try {
+
     const driverTruckDetails = await Driver.findOne({
       userDetails: _id,
     }).populate("truckDetails", "truck_type");
-    const { truck_type } =
-      driverTruckDetails && driverTruckDetails.truckDetails;
+
+    console.log(driverTruckDetails);
+    const {
+      truck_type
+    } =
+    driverTruckDetails && driverTruckDetails.truckDetails;
     const orders = await Orders.find({
       truck_type: truck_type,
       order_status: "pending",
@@ -41,12 +48,16 @@ driverController.seeOpenOrders = async (req, res) => {
 
 // route to accept orders
 driverController.acceptOrder = async (req, res) => {
-  const { id } = req.params;
+  const {
+    id
+  } = req.params;
   // returns id which this pariticular order id
   try {
     //   if user has an order don't accept another order
-    const driver = await Driver.findOne({ userDetails: req.user._id }).populate('orders');
-    const hasOrder = driver &&  driver.orders.findIndex(x => x.order_status !== "dropped_off");
+    const driver = await Driver.findOne({
+      userDetails: req.user._id
+    }).populate('orders');
+    const hasOrder = driver && driver.orders.findIndex(x => x.order_status !== "dropped_off");
     if (hasOrder !== -1) {
       return res.status(500).json({
         status: "error",
@@ -54,7 +65,9 @@ driverController.acceptOrder = async (req, res) => {
         message: "you already have an unfinished order",
       });
     }
-    const order = await Orders.findOne({ _id: id });
+    const order = await Orders.findOne({
+      _id: id
+    });
     //   checks if another driver has picked up the order
     if (order.order_status === "accepted") {
       return res.status(500).json({
@@ -69,11 +82,15 @@ driverController.acceptOrder = async (req, res) => {
     //     saves updated order status
     const accepted_order = await order.save();
     //     find driver who want's to accept order and insert accepted order into the order array
-    const updated_driver = await Driver.findOneAndUpdate(
-      { userDetails: req.user._id },
-      { $push: { orders: accepted_order._id } },
-      { new: true }
-    );
+    const updated_driver = await Driver.findOneAndUpdate({
+      userDetails: req.user._id
+    }, {
+      $push: {
+        orders: accepted_order._id
+      }
+    }, {
+      new: true
+    });
     if (updated_driver) {
       res.status(200).json({
         status: "success",
@@ -95,8 +112,8 @@ driverController.viewProfile = async (req, res) => {
   try {
     // retruns all orders
     const driverProfile = await Driver.find({
-      userDetails: req.user._id,
-    })
+        userDetails: req.user._id,
+      })
       .populate("userDetails")
       .populate("truckDetails");
     // retruns orders where status != dropped_off
@@ -118,18 +135,34 @@ driverController.viewProfile = async (req, res) => {
 driverController.activeOrder = async (req, res) => {
   try {
     // retruns all orders
-    const orderHistory = await Driver.find({
+    const activeOrder = await Driver.findOne({
       userDetails: req.user._id,
     }).populate({
       path: "orders",
-      match: { order_status: { $ne: "dropped_off" } },
+      match: {
+        order_status: {
+          $ne: "dropped_off"
+        }
+      },
     });
     // retruns orders where status != dropped_off
-    res.status(200).send({
-      statuscode: 200,
-      status: "success",
-      message: orderHistory,
-    });
+console.log(activeOrder);
+    if (activeOrder.orders.length === 0) {
+      return res.status(200).send({
+        statuscode: 200,
+        status: "success",
+        message: "No active order",
+      });
+    }
+    if (activeOrder.orders.length > 0) {
+      res.status(200).send({
+        statuscode: 200,
+        status: "success",
+        message: 'You have an active order',
+        activeOrder: activeOrder.orders[0],
+      });
+    }
+
   } catch (e) {
     res.status(500).send({
       statuscode: 500,
@@ -143,18 +176,32 @@ driverController.activeOrder = async (req, res) => {
 driverController.orderHistory = async (req, res) => {
   try {
     // retruns all orders
-    const orderHistory = await Driver.find({
+    const orderHistory = await Driver.findOne({
       userDetails: req.user._id,
     }).populate({
       path: "orders",
-      match: { order_status: "dropped_off" },
+      match: {
+        order_status: "dropped_off"
+      },
     });
     // retruns orders where status != dropped_off
-    res.status(200).send({
-      statuscode: 200,
-      status: "success",
-      message: orderHistory,
-    });
+
+    let orders = await orderHistory.orders;
+
+    if (orders.length === 0) {
+      return res.status(200).send({
+        statuscode: 200,
+        status: "success",
+        message: "Order History is empty",
+      });
+    }
+    if (orders.length > 0) {
+      res.status(200).send({
+        statuscode: 200,
+        status: "success",
+        message: orders,
+      });
+    }
   } catch (e) {
     res.status(500).send({
       statuscode: 500,

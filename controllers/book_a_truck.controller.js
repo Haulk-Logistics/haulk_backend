@@ -241,6 +241,7 @@ book_truck_controller.initialize_payment = async (req, res) => {
       // Create Order Object
       const newOrder = await new OrderModel({
         ordered_by: user._id,
+        amount: savedTransaction.amount,
         transaction_id: savedTransaction._id,
         order_status: "processing",
         nature_of_goods: natureOfGoods,
