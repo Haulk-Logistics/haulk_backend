@@ -284,7 +284,7 @@ book_truck_controller.verify_payment = async (req, res) => {
     reference
   } = req.body;
 
-  console.log(reference);
+  // console.log(reference);
 
   if (!reference) {
     return res.status(400).json({
