@@ -18,5 +18,7 @@ router.get('/active_order', isAuthorized, isTruckDriver, driverController.active
 // driver views order_history
 router.get('/order_history', isAuthorized, isTruckDriver, driverController.orderHistory);
 
+// driver views order_history
+router.get('/order_history', isAuthorized, isTruckDriver, driverController.orderHistory);
 
 module.exports = router;
