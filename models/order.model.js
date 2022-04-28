@@ -61,7 +61,8 @@ const orderSchema = new Schema({
   },
   amount: {
     type: Number,
-    require: [true, 'Amount is required'],
+    default: 0,
+    required: [true, 'Amount is required'],
   },
   order_status: {
     type: String,
