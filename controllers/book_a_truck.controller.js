@@ -335,7 +335,7 @@ book_truck_controller.verify_payment = async (req, res) => {
       const savedOrder = await order.save();
 
       res.status(200).json({
-        status: "success",
+        status: "paysuccess",
         statuscode: 200,
         message: "Payment Successful",
         data: {
@@ -383,13 +383,13 @@ book_truck_controller.verify_payment = async (req, res) => {
       await transaction.save();
 
       res.status(400).json({
-        status: "error",
+        status: "payfailed",
         statuscode: 400,
         message: "Payment Failed, Please try again, if error persists or you were debited, please contact your ATM card issuer",
       });
     } else{
       res.status(400).json({
-        status: "error",
+        status: "payfailed",
         statuscode: 400,
         message: "Payment Failed, Please try again, if error persists or you were debited, please contact your ATM card issuer",
       });
