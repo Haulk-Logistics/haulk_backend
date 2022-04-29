@@ -4,7 +4,7 @@ const User = require('../models/user.model');
 // Confirm User is logged in
 module.exports.isAuthorized = async (req, res, next) => {
     try {
-        // Confitm, that the tokKEN IS IN THE HEADER
+        // Confirm, that the TOKKEN IS IN THE HEADER
         // The token wil  be placed in the authorization header and will have the Bearer prefix, thats why we need to split it and get the token
         if (!req.headers.authorization) {
             return res.status(401).send({
