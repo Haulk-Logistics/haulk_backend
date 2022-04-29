@@ -339,8 +339,17 @@ book_truck_controller.verify_payment = async (req, res) => {
         statuscode: 200,
         message: "Payment Successful",
         data: {
-          transaction_details: savedTransaction,
-          order_details: savedOrder,
+          // transaction_details: savedTransaction,
+          // order_details: savedOrder,
+          natureOfGoods: savedOrder.nature_of_goods,
+          truckType: savedOrder.truck_type,
+          dropOffLocation: savedOrder.drop_off_location,
+          pickUpLocation: savedOrder.pick_off_location,
+          pickUpDate: savedOrder.pick_up_date,
+          containerNumber: savedOrder.container_number,
+          shippingLine: savedOrder.shipping_line,
+          // orderId: savedOrder._id,
+          transactionAmount: savedTransaction.transactionAmount,
         },
       });
       // res.redirect('/');
