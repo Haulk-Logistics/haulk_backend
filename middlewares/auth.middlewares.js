@@ -10,6 +10,7 @@ module.exports.isAuthorized = async (req, res, next) => {
             return res.status(401).send({
                 statuscode: 401,
                 status: 'error',
+                thetoken: `${req.headers.authorization}`,
                 message: 'No token provided'
             });
         }
