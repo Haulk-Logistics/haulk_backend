@@ -9,6 +9,8 @@ const {
 
 
 const Admin = require('../models/admin.model');
+const TruckDriver = require('../models/driver.model');
+const mail = require('../services/mail.services');
 const admin = {};
 
 // Create Admin
@@ -212,5 +214,114 @@ admin.getAllAdmins = async (req, res) => {
         });
     }
 };
+
+// Accept a truck driver
+admin.acceptTruckDriver = async (req, res) => {
+    const admin = await req.admin;
+    const adminId = admin._id;
+    const truckDriverId = req.params.driver_id;
+
+    // Check if admin exist
+    const adminDetails = await Admin.findById(adminId);
+    if (!adminDetails) {
+        return res.status(400).json({
+            status: 'error',
+            statusCode: 400,
+            message: 'Admin does not exist'
+        });
+    }
+
+    // Check if truck driver exist
+    const truckDriverDetails = await TruckDriver.findById(truckDriverId);
+    if (!truckDriverDetails) {
+        return res.status(400).json({
+            status: 'error',
+            statusCode: 400,
+            message: 'Truck driver does not exist'
+        });
+    }
+
+    // Check if truck driver is already accepted
+    const truckDriverAccepted = await TruckDriver.findOne({
+        _id: truckDriverId,
+        accepted: true
+    });
+    if (truckDriverAccepted) {
+        return res.status(400).json({
+            status: 'error',
+            statusCode: 400,
+            message: 'Truck driver is already accepted'
+        });
+    }
+
+    // Accept truck driver
+    truckDriverDetails.accepted = true;
+   const driverDetails = await truckDriverDetails.save();
+
+   // Get Driver Email
+   
+
+   console.log(driverDetails);
+
+    // Send email to truck driver
+    await mail.sendTruckDriverAcceptedEmail()
+
+    
+    res.status(200).json({
+        status: 'success',
+        statusCode: 200,
+        message: 'Truck driver accepted successfully'
+    });
+
+    
+
+};
+
+// Truck Drivers Awaiting Acceptance
+admin.getUnverifiedDrivers = async (req, res) => {
+    try {
+        const admin = await req.admin;
+    const adminId = admin._id;
+
+    // Check if admin exist
+    const adminDetails = await Admin.findById(adminId);
+    if (!adminDetails) {
+        return res.status(400).json({
+            status: 'error',
+            statusCode: 400,
+            message: 'Admin does not exist'
+        });
+    }
+
+    // Get all unaccepted truck drivers
+    const truckDrivers = await TruckDriver.find({
+        accepted: false
+    });
+    if (truckDrivers.length === 0) {
+        return res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'No truck drivers are awaiting acceptance',
+            truckDrivers: []
+        });
+        
+    }
+    res.status(200).json({
+        status: 'success',
+        statusCode: 200,
+        message: 'Truck drivers retrieved successfully',
+        truckDrivers: truckDrivers
+    });
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'error',
+            statusCode: 500,
+            message: 'Internal Server Error',
+        });
+
+    }
+}
 
 module.exports = admin;

@@ -16,6 +16,7 @@ const databaseUrl = process.env.MONGOURL;
 // routes
 const auth = require('./routes/auth.routes');
 const admin = require('./routes/admin_owner_routes/admin.routes');
+const wallet = require("./routes/truck_driver_routes/wallet.routes");
 const truckDriver = require('./routes/truck_driver_routes/driver.route');
 const cargoOwner = require('./routes/cargo_owner_routes/order_details.routes');
 const bookAtruck = require("./routes/cargo_owner_routes/book_truck.routes");
@@ -65,6 +66,8 @@ app.use("/api/auth", auth);
 
 // Booking Truck route
 app.use("/api/", bookAtruck);
+
+app.use("/api/wallet/", wallet);
 
 app.use('/api/cargoowner', cargoOwner);
 

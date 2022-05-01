@@ -6,12 +6,17 @@ const {
 const WalletSchema = new Schema({
     currentBalance: {
         type: Number,
+        min: 0,
         default: 0
     },
+
     withdrawableBalance: {
         type: Number,
+        min: 0,
         default: 0
     },
+
+
 });
 
 

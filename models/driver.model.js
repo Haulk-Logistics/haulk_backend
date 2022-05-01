@@ -20,6 +20,16 @@ const truckDriverSchema = new Schema({
       ref: "order",
     },
   ],
+
+
+accepted: {
+    type: Boolean,
+    // index: true,
+    default: false
+},
+
+
+
 });
 
 const TruckDriver = mongoose.model("TruckDriver", truckDriverSchema);
