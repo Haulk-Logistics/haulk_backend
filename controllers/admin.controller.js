@@ -296,7 +296,7 @@ admin.getUnverifiedDrivers = async (req, res) => {
     // Get all unaccepted truck drivers
     const truckDrivers = await TruckDriver.find({
         accepted: false
-    });
+    }).populate('truckDetails').populate('userDetails');
     if (truckDrivers.length === 0) {
         return res.status(200).json({
             status: 'success',
