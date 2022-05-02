@@ -14,6 +14,10 @@ const truckDriverSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref:'Wallet'
   },
+  // admin_verified: {
+  //   type: Boolean,
+  //   default: false
+  // },
   orders: [
     {
       type: Schema.Types.ObjectId,
