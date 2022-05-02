@@ -112,7 +112,7 @@ driverController.acceptOrder = async (req, res) => {
 driverController.viewProfile = async (req, res) => {
   try {
     // retruns all orders
-    const driverProfile = await Driver.find({
+    const driverProfile = await Driver.findOne({
         userDetails: req.user._id,
       })
       .populate("userDetails")
