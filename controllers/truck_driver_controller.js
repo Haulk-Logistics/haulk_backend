@@ -159,8 +159,7 @@ driverController.activeOrder = async (req, res) => {
       res.status(200).send({
         statuscode: 200,
         status: "success",
-        message: "You have an active order",
-        activeOrder: activeOrder.orders[0],
+        message: activeOrder.orders[0],
       });
     }
   } catch (e) {
