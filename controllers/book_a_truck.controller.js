@@ -342,12 +342,16 @@ book_truck_controller.verify_payment = async (req, res) => {
           transaction_id: savedTransaction._id
         };
         const update = {
-          transaction_ref : savedTransaction.transactionReference,
+          transaction_ref: savedTransaction.transactionReference,
           order_status: "pending"
         };
-        const order = await OrderModel.findOne({
-          transaction_id: savedTransaction._id
-        });
+        const order = await OrderModel.findOneAndUpdate(
+          filter,
+          update,
+          //   {
+          //   transaction_id: savedTransaction._id
+          // }
+        );
         order.transaction_ref = await savedTransaction.transactionReference;
         order.order_status = "pending";
         const savedOrder = await order.save();
