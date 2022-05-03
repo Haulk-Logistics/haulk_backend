@@ -10,7 +10,6 @@ driverController.seeOpenOrders = async (req, res) => {
     _id
   } = req.user;
   try {
-
     const driverTruckDetails = await Driver.findOne({
       userDetails: _id,
     }).populate("truckDetails", "truck_type");
@@ -55,9 +54,11 @@ driverController.acceptOrder = async (req, res) => {
   try {
     //   if user has an order don't accept another order
     const driver = await Driver.findOne({
-      userDetails: req.user._id
-    }).populate('orders');
-    const hasOrder = driver && driver.orders.findIndex(x => x.order_status !== "dropped_off");
+      userDetails: req.user._id,
+    }).populate("orders");
+    const hasOrder =
+      driver &&
+      driver.orders.findIndex((x) => x.order_status !== "dropped_off");
     if (hasOrder !== -1) {
       return res.status(500).json({
         status: "error",
@@ -66,7 +67,7 @@ driverController.acceptOrder = async (req, res) => {
       });
     }
     const order = await Orders.findOne({
-      _id: id
+      _id: id,
     });
     //   checks if another driver has picked up the order
     if (order.order_status === "accepted") {
@@ -83,13 +84,13 @@ driverController.acceptOrder = async (req, res) => {
     const accepted_order = await order.save();
     //     find driver who want's to accept order and insert accepted order into the order array
     const updated_driver = await Driver.findOneAndUpdate({
-      userDetails: req.user._id
+      userDetails: req.user._id,
     }, {
       $push: {
-        orders: accepted_order._id
-      }
+        orders: accepted_order._id,
+      },
     }, {
-      new: true
+      new: true,
     });
     if (updated_driver) {
       res.status(200).json({
@@ -111,7 +112,7 @@ driverController.acceptOrder = async (req, res) => {
 driverController.viewProfile = async (req, res) => {
   try {
     // retruns all orders
-    const driverProfile = await Driver.find({
+    const driverProfile = await Driver.findOne({
         userDetails: req.user._id,
       })
       .populate("userDetails")
@@ -141,12 +142,12 @@ driverController.activeOrder = async (req, res) => {
       path: "orders",
       match: {
         order_status: {
-          $ne: "dropped_off"
-        }
+          $ne: "dropped_off",
+        },
       },
     });
     // retruns orders where status != dropped_off
-console.log(activeOrder);
+    console.log(activeOrder);
     if (activeOrder.orders.length === 0) {
       return res.status(200).send({
         statuscode: 200,
@@ -158,11 +159,9 @@ console.log(activeOrder);
       res.status(200).send({
         statuscode: 200,
         status: "success",
-        message: 'You have an active order',
-        activeOrder: activeOrder.orders[0],
+        message: activeOrder.orders[0],
       });
     }
-
   } catch (e) {
     res.status(500).send({
       statuscode: 500,
@@ -181,7 +180,7 @@ driverController.orderHistory = async (req, res) => {
     }).populate({
       path: "orders",
       match: {
-        order_status: "dropped_off"
+        order_status: "dropped_off",
       },
     });
     // retruns orders where status != dropped_off
@@ -207,6 +206,68 @@ driverController.orderHistory = async (req, res) => {
       statuscode: 500,
       status: "error",
       message: "Error retrieving order history",
+    });
+  }
+};
+
+// updates order status
+driverController.updateOrderStatus = async (req, res) => {
+  try {
+    const {
+      id
+    } = req.params;
+
+    const orderStatus = await req.body.status;
+    if (!orderStatus) {
+      return res.status(400).json({
+        status: "error",
+        statuscode: 400,
+        message: "Please provide order status",
+      });
+    }
+    // Turns Order Status To LowerCase Chracters
+    const orderStatusLower = orderStatus.toString().toLowerCase();
+    const validOrderStatus = ["accepted", "picked_up", "dropped_off", "in_transit"];
+  
+    // Check if order with that id exists
+    const order = await Orders.findOne({
+      _id: id
+    });
+
+    // Confirm Order Is Valid
+    if (!order) {
+      return res.status(404).json({
+        status: "error",
+        statuscode: 404,
+        message: "Order with that id not found"
+      });
+    }
+console.log(orderStatus);
+// Check If Valid Order Status contains the order status
+    if (!validOrderStatus.includes(orderStatusLower)) {
+      return res.status(400).json({
+        status: "error",
+        statuscode: 400,
+        message: "Please provide a valid order status",
+      });
+    }
+
+    order.order_status = orderStatus;
+    //  save order
+    const updatedOrder = await order.save();
+    if (updatedOrder) {
+      return res.status(200).send({
+        statuscode: 200,
+        status: "success",
+        message: "Order status updated successfully",
+      });
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(500).send({
+      statuscode: 500,
+      status: "error",
+      message: "Error updating order status",
     });
   }
 };

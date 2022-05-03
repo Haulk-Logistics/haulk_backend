@@ -239,11 +239,12 @@ auth.signupTruckDriver = async (req, res, next) => {
             }
 
             if (!phoneNumber) {
-                return res.status(400).json({
-                    status: 'error',
-                    statusCode: 400,
-                    message: 'Phone number is required'
-                });
+                phoneNumber = '+234809000000';
+                // return res.status(400).json({
+                //     status: 'error',
+                //     statusCode: 400,
+                //     message: 'Phone number is required'
+                // });
             }
 
             if (!password) {
@@ -528,7 +529,7 @@ auth.signupTruckDriver = async (req, res, next) => {
                     email: newUser.email
                 },
                 process.env.TOKEN_SECRET, {
-                    expiresIn: "1h"
+                    expiresIn: "6h"
                 });
 
             // send a verification email
@@ -1017,6 +1018,23 @@ auth.changePassword = async (req, res, next) => {
             status: 'error',
             statusCode: 500,
             message: "Internal server error, please try again, if error persists, contact 'support@haulk.com'"
+        });
+    }
+}
+
+auth.getUserProfile = async (req,res) => {
+    try {
+       const user = await User.findOne({_id: req.user.id});
+       res.status(200).json({
+           statuscode: 200,
+           status: "success",
+           message: user
+       })
+    } catch (error) {
+        return res.status(400).json({
+            status: 'error',
+            statusCode: 400,
+            message: 'Error retrieving user details'
         });
     }
 }
