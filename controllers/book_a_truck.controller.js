@@ -338,19 +338,28 @@ book_truck_controller.verify_payment = async (req, res) => {
         const savedTransaction = await transaction.save();
 
         // Update Order Status
-        const order = await OrderModel.findOne({
+        const filter = {
           transaction_id: savedTransaction._id
-        });
-        order.transaction_ref = await savedTransaction.transactionReference;
-        order.order_status = "pending";
-        const savedOrder = await order.save();
+        };
+        const update = {
+          transaction_ref : savedTransaction.transactionReference,
+          order_status: "pending"
+        };
+        // const order = await OrderModel.findOne({
+        //   transaction_id: savedTransaction._id
+        // });
+        // order.transaction_ref = await savedTransaction.transactionReference;
+        // order.order_status = "pending";
+        // const savedOrder = await order.save();
+        const savedOrder = await OrderModel.updateOne(filter, update, {new: true});
 
         res.status(200).json({
           status: "paysuccess",
           statuscode: 200,
           message: "Payment Successful",
           data: {
-
+            orderStatus: savedOrder.order_status,
+            transactionStatus: savedTransaction.transactionStatus,
             natureOfGoods: savedOrder.nature_of_goods,
             truckType: savedOrder.truck_type,
             dropOffLocation: savedOrder.drop_off_location,
@@ -360,8 +369,8 @@ book_truck_controller.verify_payment = async (req, res) => {
             shippingLine: savedOrder.shipping_line,
             // orderId: savedOrder._id,
             transactionAmount: savedTransaction.transactionAmount,
-            transaction_details: savedTransaction,
-            order_details: savedOrder,
+            // transaction_details: savedTransaction,
+            // order_details: savedOrder,
           },
         });
         // res.redirect('/');
