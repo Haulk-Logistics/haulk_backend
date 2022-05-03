@@ -64,8 +64,10 @@ cargoOwnwer.getAllOrders = async (req, res) => {
 
 cargoOwnwer.getActiveOrder = async (req, res) => {
   try {
+    const user = await req.user;
     const orders = await Order.find({
-      ordered_by: req.user._id,
+      ordered_by: user._id,
+      transaction_ref: { $ne: 'paypending' },
       order_status: { $ne: "dropped_off" },
     });
     if (orders && orders.length > 0) {
@@ -139,5 +141,8 @@ cargoOwnwer.getEachOrder = async (req, res) => {
     });
   }
 }
+
+
+
 
 module.exports = cargoOwnwer;
