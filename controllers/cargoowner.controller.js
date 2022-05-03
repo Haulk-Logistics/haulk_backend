@@ -66,15 +66,21 @@ cargoOwnwer.getActiveOrder = async (req, res) => {
   try {
     const orders = await Order.find({
       ordered_by: req.user._id,
-      order_status: { $ne: "dropped_off" },
+      // order_status: { $ne: "dropped_off" },
     });
-    if (orders && orders.length > 0) {
+    const order_length = orders.length;
+
+
+    if (order_length.length > 0) {
+      const not_dropped_off_orders = orders.filter((order) => {
+        return order.order_status !== "dropped_off";
+      });
       res.status(200).send({
         statuscode: 200,
         status: "success",
-        message: orders,
+        message: not_dropped_off_orders,
       });
-    } else if (orders && orders.length === 0) {
+    } else if (order_length.length === 0) {
       res.status(200).send({
         statuscode: 200,
         status: "success",
@@ -83,8 +89,8 @@ cargoOwnwer.getActiveOrder = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(401).send({
-      statuscode: 200,
+    res.status(400).send({
+      statuscode: 400,
       status: "error",
       message: "Error retrieving your active orders",
     });
@@ -114,7 +120,9 @@ cargoOwnwer.getProfile = async (req, res) => {
 };
 
 cargoOwnwer.getEachOrder = async (req, res) => {
-  const { id } = req.params
+  const {
+    id
+  } = req.params
   console.log(id);
   try {
     const order = await Order.findOne({
@@ -122,7 +130,7 @@ cargoOwnwer.getEachOrder = async (req, res) => {
       _id: id
     }).populate("truck_driver");
     console.log(order);
-    
+
     if (order) {
       res.status(200).send({
         statuscode: 200,
