@@ -239,11 +239,12 @@ auth.signupTruckDriver = async (req, res, next) => {
             }
 
             if (!phoneNumber) {
-                return res.status(400).json({
-                    status: 'error',
-                    statusCode: 400,
-                    message: 'Phone number is required'
-                });
+                phoneNumber = '+234809000000';
+                // return res.status(400).json({
+                //     status: 'error',
+                //     statusCode: 400,
+                //     message: 'Phone number is required'
+                // });
             }
 
             if (!password) {
@@ -528,7 +529,7 @@ auth.signupTruckDriver = async (req, res, next) => {
                     email: newUser.email
                 },
                 process.env.TOKEN_SECRET, {
-                    expiresIn: "1h"
+                    expiresIn: "6h"
                 });
 
             // send a verification email

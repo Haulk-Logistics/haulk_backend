@@ -36,6 +36,7 @@ cargoOwnwer.getAllOrders = async (req, res) => {
     const orders = await Order.find({
       ordered_by: req.user._id,
     });
+
     if (orders && orders.length > 0) {
       res.status(200).send({
         statuscode: 200,
@@ -53,8 +54,8 @@ cargoOwnwer.getAllOrders = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(401).send({
-      statuscode: 200,
+    res.status(400).send({
+      statuscode: 400,
       status: "error",
       message: "Error retrieving your orders",
     });
@@ -63,9 +64,11 @@ cargoOwnwer.getAllOrders = async (req, res) => {
 
 cargoOwnwer.getActiveOrder = async (req, res) => {
   try {
+    const user = await req.user;
     const orders = await Order.find({
-      ordered_by: req.user._id,
-      order_status: { $ne: "dropped_off" },
+      ordered_by: user._id,
+      // transaction_ref: { $ne: 'paypending' },
+      // order_status: { $ne: "dropped_off" },
     });
     if (orders && orders.length > 0) {
       res.status(200).send({
@@ -138,5 +141,8 @@ cargoOwnwer.getEachOrder = async (req, res) => {
     });
   }
 }
+
+
+
 
 module.exports = cargoOwnwer;
