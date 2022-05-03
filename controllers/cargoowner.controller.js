@@ -70,6 +70,7 @@ cargoOwnwer.getActiveOrder = async (req, res) => {
       transaction_ref: { $ne: 'paypending' },
       order_status: { $ne: "dropped_off" },
     });
+    console.log(orders);
     if (orders && orders.length > 0) {
       res.status(200).send({
         statuscode: 200,

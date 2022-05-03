@@ -17,7 +17,7 @@ const transactionSchema = new Schema({
     // TRANSACTION ID
     transaction_id: {
         type: String,
-        default: haulk_uid.v2(),
+        // default: haulk_uid.v2(),
         // unique: true
     },
     //TRANSACTION TYPE

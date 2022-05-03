@@ -22,6 +22,7 @@ const {
 } = require("../services/cloudinary.services");
 const getDistanceFromLatLonInKm = require("../utils/calculate_distance");
 const paystack = require("../services/paystack.services");
+const haulk_uid = require("../utils/unique_id_gen");
 // const { response } = require("express");
 const book_truck_controller = {};
 
@@ -225,11 +226,12 @@ book_truck_controller.initialize_payment = async (req, res) => {
         }
         const response = JSON.parse(body);
 
-        console.log(response);
+        // console.log(response);
 
         // Create Transaction Object
         const transaction = await new TransactionModel({
           userDetails: user._id,
+          transaction_id: haulk_uid.v2(),
           transactionType: "deposit",
           transactionAmount: amount,
           transactionStatus: "pending",
@@ -319,9 +321,11 @@ book_truck_controller.verify_payment = async (req, res) => {
       // console.log(response);
       if (response.data.status === "success") {
         // Update Transaction Status
-        const transaction = await TransactionModel.findOne({
+        const transaction = await TransactionModel.findOneAndUpdate({
           transactionReference: reference
-        });
+        }, {transactionStatus: "completed"}, {new: true});
+
+        console.log(transaction);
 
         if (!transaction) {
           return res.status(400).json({
@@ -331,31 +335,38 @@ book_truck_controller.verify_payment = async (req, res) => {
           });
         }
 
-
-        console.log(transaction);
-        transaction.transactionStatus = "completed";
-        // transaction.transactionReference = response.data.reference;
-        transaction.markModified('transactionStatus');
-        const savedTransaction = await transaction.save();
-
         // Update Order Status
-        const filter = {
-          transaction_id: savedTransaction._id
-        };
-        const update = {
-          transaction_ref: savedTransaction.transactionReference,
-          order_status: "pending"
-        };
-        const order = await OrderModel.findOne({
-          transaction_id: savedTransaction._id
-        });
-        order.transaction_ref = await savedTransaction.transactionReference;
-        order.order_status = "pending";
-        await order.markModified("transaction_ref");
-        await order.markModified("order_status");
-        const savedOrder = await order.save();
-        // const savedOrder = await OrderModel.updateOne(filter, update, {new: true});
-        console.log(savedOrder);
+        const order = await OrderModel.findOneAndUpdate({
+          transaction_id: transaction._id
+        }, {order_status: "pending", transaction_ref : transaction.transactionReference}, {new: true});
+
+console.log(order);
+        // transaction.transactionStatus = "completed";
+        // // transaction.transactionReference = response.data.reference;
+        // transaction.markModified('transactionStatus');
+        // const savedTransaction = await transaction.save();
+
+        // // Update Order Status
+        // const filter = {
+        //   transaction_id: savedTransaction._id
+        // };
+        // const update = {
+        //   transaction_ref: savedTransaction.transactionReference,
+        //   order_status: "pending"
+        // };
+        // const order = await OrderModel.findOne({
+        //   transaction_id: savedTransaction._id
+        // });
+        // order.transaction_ref = await savedTransaction.transactionReference;
+        // order.order_status = "pending";
+        // await order.markModified("transaction_ref");
+        // await order.markModified("order_status");
+        // const savedOrder = await order.save();
+        // // const savedOrder = await OrderModel.updateOne(filter, update, {new: true});
+        // console.log(savedOrder);
+        const savedOrder = await order;
+        const savedTransaction = await transaction;
+
 
         res.status(200).json({
           status: "paysuccess",

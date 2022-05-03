@@ -14,11 +14,11 @@ const orderSchema = new Schema({
   truck_driver:{
     type: Schema.Types.ObjectId,
     ref: "User",
-    default: null
+    default: null,
   },
   nature_of_goods: {
     type: String,
-    required: [true, 'natrue of good is required'],
+    required: [true, 'nature of good is required'],
   },
   truck_type: {
     type: String,
