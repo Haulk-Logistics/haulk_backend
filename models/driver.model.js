@@ -1,22 +1,41 @@
-const mongoose = require('mongoose');
-const {
-    Schema
-} = mongoose;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const truckDriverSchema = new Schema({
-    userDetails: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
+  userDetails: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
+  truckDetails: {
+    type: Schema.Types.ObjectId,
+    ref: "Truck",
+  },
+  wallet: {
+    type: Schema.Types.ObjectId,
+    ref:'Wallet'
+  },
+  // admin_verified: {
+  //   type: Boolean,
+  //   default: false
+  // },
+  orders: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "order",
+    },
+  ],
 
-    },
-    truckDetails: {
-        type: Schema.Types.ObjectId,
-        ref: 'Truck'
-    },
+
+accepted: {
+    type: Boolean,
+    // index: true,
+    default: false
+},
+
+
+
 });
 
-
-
-const TruckDriver = mongoose.model('TruckDriver', truckDriverSchema);
+const TruckDriver = mongoose.model("TruckDriver", truckDriverSchema);
 
 module.exports = TruckDriver;
