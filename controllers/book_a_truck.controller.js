@@ -265,12 +265,6 @@ book_truck_controller.initialize_payment = async (req, res) => {
         res.status(200).json({
           authorization_url: response.data.authorization_url,
         });
-        // Redirect to Paystack Payment Page
-        // res.redirect(response.data.authorization_url);
-
-
-
-
       });
     });
   } catch (error) {
@@ -286,11 +280,8 @@ book_truck_controller.initialize_payment = async (req, res) => {
 // Verify Paystack Payment, Update Order Status and Transaction Status
 book_truck_controller.verify_payment = async (req, res) => {
   try {
-    // const {
-    //   reference
-    // } = req.body;
+
     const trf_ref = await req.body.reference;
-    // console.log(reference);
 
     if (!trf_ref) {
       return res.status(400).json({
@@ -348,30 +339,6 @@ book_truck_controller.verify_payment = async (req, res) => {
           new: true
         });
 
-        console.log(order);
-        // transaction.transactionStatus = "completed";
-        // // transaction.transactionReference = response.data.reference;
-        // transaction.markModified('transactionStatus');
-        // const savedTransaction = await transaction.save();
-
-        // // Update Order Status
-        // const filter = {
-        //   transaction_id: savedTransaction._id
-        // };
-        // const update = {
-        //   transaction_ref: savedTransaction.transactionReference,
-        //   order_status: "pending"
-        // };
-        // const order = await OrderModel.findOne({
-        //   transaction_id: savedTransaction._id
-        // });
-        // order.transaction_ref = await savedTransaction.transactionReference;
-        // order.order_status = "pending";
-        // await order.markModified("transaction_ref");
-        // await order.markModified("order_status");
-        // const savedOrder = await order.save();
-        // // const savedOrder = await OrderModel.updateOne(filter, update, {new: true});
-        // console.log(savedOrder);
         const savedOrder = await order;
         const savedTransaction = await transaction;
 
@@ -391,13 +358,9 @@ book_truck_controller.verify_payment = async (req, res) => {
             pickUpDate: savedOrder.pick_up_date,
             containerNumber: savedOrder.container_number,
             shippingLine: savedOrder.shipping_line,
-            // orderId: savedOrder._id,
             transactionAmount: savedTransaction.transactionAmount,
-            // transaction_details: savedTransaction,
-            // order_details: savedOrder,
           },
         });
-        // res.redirect('/');
       } else if (response.data.status === "failed") {
         // confirm reference number exist
         const verifyRefNo = await TransactionModel.findOne({
