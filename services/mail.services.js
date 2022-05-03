@@ -67,7 +67,7 @@ mail.sendTruckDriverAcceptedEmail = async (email, driver_name) => {
         to: email,
         subject: 'ACCOUNT VERIFIED',
         text: `Hello ${driver_name},\n\n
-        Your account has been successfully verified and you can now accept orders.\n\n
+        Congratulations, your account has been successfully verified and you can now accept orders.\n\n
         Please contact the haulk admins directly if you have any questions.\n\n
         Regards,\n\n
         The haulk admins`

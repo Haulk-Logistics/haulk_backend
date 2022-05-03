@@ -36,6 +36,7 @@ router.put("/driver/accept_driver/:driver_id", isAdmin, adminController.acceptTr
 router.get("/driver/awaiting_approval", isAdmin, adminController.getUnverifiedDrivers);
 
 // api that returns list of truck drivers approved
+router.get("/driver/approved", isAdmin, adminController.getVerifiedDrivers);
 
 // api that returns list of truck drivers declined
 

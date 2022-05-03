@@ -36,6 +36,7 @@ cargoOwnwer.getAllOrders = async (req, res) => {
     const orders = await Order.find({
       ordered_by: req.user._id,
     });
+
     if (orders && orders.length > 0) {
       res.status(200).send({
         statuscode: 200,
