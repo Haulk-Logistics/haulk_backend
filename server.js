@@ -83,6 +83,7 @@ app.use("*", (req, res, next) => {
   });
 });
 
+
 // START SERVER
 app.listen(process.env.PORT || PORT, () => {
   console.log(`Haulk ${process.env.APP_ENV} Server started on port ${PORT}`);

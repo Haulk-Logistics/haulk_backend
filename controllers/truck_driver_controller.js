@@ -112,7 +112,7 @@ driverController.acceptOrder = async (req, res) => {
 driverController.viewProfile = async (req, res) => {
   try {
     // retruns all orders
-    const driverProfile = await Driver.find({
+    const driverProfile = await Driver.findOne({
         userDetails: req.user._id,
       })
       .populate("userDetails")
@@ -159,8 +159,7 @@ driverController.activeOrder = async (req, res) => {
       res.status(200).send({
         statuscode: 200,
         status: "success",
-        message: "You have an active order",
-        activeOrder: activeOrder.orders[0],
+        message: activeOrder.orders[0],
       });
     }
   } catch (e) {
