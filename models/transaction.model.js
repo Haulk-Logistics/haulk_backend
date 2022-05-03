@@ -58,7 +58,7 @@ const transactionSchema = new Schema({
     transactionReference: {
         type: String,
         // unique: true,
-        default: haulk_uid.v2(),
+        // default: haulk_uid.v2(),
     },
 
 });

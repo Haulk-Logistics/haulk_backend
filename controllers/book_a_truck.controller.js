@@ -231,7 +231,7 @@ book_truck_controller.initialize_payment = async (req, res) => {
         // Create Transaction Object
         const transaction = await new TransactionModel({
           userDetails: user._id,
-          transaction_id: haulk_uid.v2(),
+          // transaction_id: haulk_uid.v2(),
           transactionType: "deposit",
           transactionAmount: amount,
           transactionStatus: "pending",
@@ -245,8 +245,9 @@ book_truck_controller.initialize_payment = async (req, res) => {
         // Create Order Object
         const newOrder = await new OrderModel({
           ordered_by: user._id,
-          amount: savedTransaction.amount,
+          amount: savedTransaction.transactionAmount,
           transaction_id: savedTransaction._id,
+          transaction_ref: savedTransaction.transactionReference,
           order_status: "processing",
           nature_of_goods: natureOfGoods,
           truck_type: truckType,
@@ -285,13 +286,13 @@ book_truck_controller.initialize_payment = async (req, res) => {
 // Verify Paystack Payment, Update Order Status and Transaction Status
 book_truck_controller.verify_payment = async (req, res) => {
   try {
-    const {
-      reference
-    } = req.body;
-
+    // const {
+    //   reference
+    // } = req.body;
+    const trf_ref = await req.body.reference;
     // console.log(reference);
 
-    if (!reference) {
+    if (!trf_ref) {
       return res.status(400).json({
         status: "error",
         statuscode: 400,
@@ -299,9 +300,8 @@ book_truck_controller.verify_payment = async (req, res) => {
       });
     }
 
-    paystack.verifyPayment(reference, async (error, body) => {
+    await paystack.verifyPayment(trf_ref, async (error, body) => {
       if (error) {
-        //handle errors
         console.log(error);
         return res.status(500).json({
           status: "error",
@@ -322,11 +322,12 @@ book_truck_controller.verify_payment = async (req, res) => {
       if (response.data.status === "success") {
         // Update Transaction Status
         const transaction = await TransactionModel.findOneAndUpdate({
-          transactionReference: reference
-        }, {transactionStatus: "completed"}, {new: true});
-
-        console.log(transaction);
-
+          transactionReference: trf_ref,
+        }, {
+          transactionStatus: "completed"
+        }, {
+          new: true
+        });
         if (!transaction) {
           return res.status(400).json({
             status: "error",
@@ -335,12 +336,19 @@ book_truck_controller.verify_payment = async (req, res) => {
           });
         }
 
+        console.log(transaction);
+
         // Update Order Status
         const order = await OrderModel.findOneAndUpdate({
           transaction_id: transaction._id
-        }, {order_status: "pending", transaction_ref : transaction.transactionReference}, {new: true});
+        }, {
+          order_status: "pending",
+          transaction_ref: transaction.transactionReference
+        }, {
+          new: true
+        });
 
-console.log(order);
+        console.log(order);
         // transaction.transactionStatus = "completed";
         // // transaction.transactionReference = response.data.reference;
         // transaction.markModified('transactionStatus');
@@ -373,6 +381,7 @@ console.log(order);
           statuscode: 200,
           message: "Payment Successful",
           data: {
+            transactionId: savedOrder.transaction_id,
             orderStatus: savedOrder.order_status,
             transactionStatus: savedTransaction.transactionStatus,
             natureOfGoods: savedOrder.nature_of_goods,
