@@ -69,7 +69,7 @@ const orderSchema = new Schema({
     lowercase: true,
     required: [true, 'order status is required'],
     enum: ["processing","pending", "accepted", "picked_up", "in_transit", "dropped_off"],
-    default: "processing",
+    // default: "processing",
   },
 });
 
