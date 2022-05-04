@@ -2,7 +2,7 @@ const { Schema, model } = require("mongoose");
 const orderSchema = new Schema({
   ordered_by: {
     type: Schema.Types.ObjectId,
-    ref: "cargoowner",
+    ref: "User",
     required: [true, 'user id is required']
   },
   transaction_id: {
