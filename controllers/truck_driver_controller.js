@@ -1,6 +1,8 @@
 // import models
 const Driver = require("../models/driver.model");
+const Wallet = require("../models/driver_wallet.model");
 const Orders = require("../models/order.model");
+const mail = require("../services/mail.services");
 
 const driverController = {};
 
@@ -55,31 +57,37 @@ driverController.acceptOrder = async (req, res) => {
     //   if user has an order don't accept another order
     const driver = await Driver.findOne({
       userDetails: req.user._id,
-    }).populate("orders");
+    }).populate("orders").populate("userDetails").populate("truckDetails");
     const hasOrder =
       driver &&
       driver.orders.findIndex((x) => x.order_status !== "dropped_off");
     if (hasOrder !== -1) {
-      return res.status(500).json({
+      return res.status(200).json({
         status: "error",
-        statuscode: 500,
+        statuscode: 200,
         message: "you already have an unfinished order",
       });
     }
     const order = await Orders.findOne({
       _id: id,
-    });
+    }).populate('ordered_by');
     //   checks if another driver has picked up the order
     if (order.order_status === "accepted") {
-      return res.status(500).json({
+      return res.status(200).json({
         status: "error",
-        statuscode: 500,
+        statuscode: 200,
         message: "order has been picked up by driver",
       });
     }
     //     updates the order status to active
+    //     and adds the driver to the order
     order.order_status = "accepted";
-    order.truck_driver = req.user._id;
+    order.truck_driver_name = `${driver.userDetails.firstName} ${driver.userDetails.lastName}`;
+    order.truck_driver_phone = driver.userDetails.phoneNumber;
+    order.truck_driver_image= driver.truckDetails.driver_image;
+    order.truck_driver_truck_number = driver.truckDetails.licence_plate_number;
+    console.log(order.truck_driver_truck_number);
+
     //     saves updated order status
     const accepted_order = await order.save();
     //     find driver who want's to accept order and insert accepted order into the order array
@@ -91,12 +99,20 @@ driverController.acceptOrder = async (req, res) => {
       },
     }, {
       new: true,
-    });
+    }).populate('userDetails');
     if (updated_driver) {
+      // send Email notification to the user
+      const usersEmail = order.ordered_by.email;
+      const driver_name = `${updated_driver.userDetails.firstName}`;
+      const order_id = order._id;
+      const usersName = order.ordered_by.firstName;
+      await mail.sendOrderAcceptedByDriverEmail(usersEmail, driver_name, order_id, usersName);
+
+
       res.status(200).json({
         status: "success",
         statuscode: 200,
-        message: "you have successfully booked your order",
+        message: "you have successfully accepted an order",
       });
     }
   } catch (error) {

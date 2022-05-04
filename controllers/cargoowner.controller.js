@@ -67,9 +67,9 @@ cargoOwnwer.getActiveOrder = async (req, res) => {
     const user = await req.user;
     const orders = await Order.find({
       ordered_by: user._id,
-      // transaction_ref: { $ne: 'paypending' },
-      // order_status: { $ne: "dropped_off" },
-    });
+      transaction_ref: { $ne: 'paypending' },
+      order_status: { $ne: "dropped_off" },
+    }).populate('ordered_by');
     if (orders && orders.length > 0) {
       res.status(200).send({
         statuscode: 200,

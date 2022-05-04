@@ -11,6 +11,7 @@ const {
 const Admin = require('../models/admin.model');
 const TruckDriver = require('../models/driver.model');
 const mail = require('../services/mail.services');
+const OrderModel = require('../models/order.model');
 const admin = {};
 
 // Create Admin
@@ -217,67 +218,160 @@ admin.getAllAdmins = async (req, res) => {
 
 // Accept a truck driver
 admin.acceptTruckDriver = async (req, res) => {
-    const admin = await req.admin;
-    const adminId = admin._id;
-    const truckDriverId = req.params.driver_id;
+    try {
+        const admin = await req.admin;
+        const adminId = admin._id;
+        const truckDriverId = req.params.driver_id;
 
-    // Check if admin exist
-    const adminDetails = await Admin.findById(adminId);
-    if (!adminDetails) {
-        return res.status(400).json({
-            status: 'error',
-            statusCode: 400,
-            message: 'Admin does not exist'
+        // Check if admin exist
+        const adminDetails = await Admin.findById(adminId);
+        if (!adminDetails) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Admin does not exist'
+            });
+        }
+
+        // Check if truck driver exist
+        const truckDriverDetails = await TruckDriver.findById(truckDriverId);
+        if (!truckDriverDetails) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Truck driver does not exist'
+            });
+        }
+
+        // Check if truck driver is already accepted
+        const truckDriverAccepted = await TruckDriver.findOne({
+            _id: truckDriverId,
+            accepted: 'verified'
         });
-    }
+        if (truckDriverAccepted) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Truck driver is already accepted'
+            });
+        }
 
-    // Check if truck driver exist
-    const truckDriverDetails = await TruckDriver.findById(truckDriverId);
-    if (!truckDriverDetails) {
-        return res.status(400).json({
-            status: 'error',
-            statusCode: 400,
-            message: 'Truck driver does not exist'
+        // Accept truck driver
+        truckDriverDetails.accepted = 'verified';
+        const acceptedDriver = await truckDriverDetails.save();
+
+        // Get Driver Email
+        const driverDetails = await TruckDriver.findById(acceptedDriver._id).populate('userDetails');
+
+        // console.log(driverDetails);
+        const driverEmail = await driverDetails.userDetails.email;
+        const driverName = await driverDetails.userDetails.firstName;
+
+        // Send email to truck driver
+        await mail.sendTruckDriverAcceptedEmail(driverEmail, driverName);
+
+
+        res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'Truck driver verified successfully'
         });
-    }
 
-    // Check if truck driver is already accepted
-    const truckDriverAccepted = await TruckDriver.findOne({
-        _id: truckDriverId,
-        accepted: true
-    });
-    if (truckDriverAccepted) {
-        return res.status(400).json({
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
             status: 'error',
-            statusCode: 400,
-            message: 'Truck driver is already accepted'
+            statusCode: 500,
+            message: 'Internal Server Error',
         });
+
     }
-
-    // Accept truck driver
-    truckDriverDetails.accepted = true;
-    const acceptedDriver = await truckDriverDetails.save();
-
-    // Get Driver Email
-    const driverDetails = await TruckDriver.findById(acceptedDriver._id).populate('userDetails');
-
-    console.log(driverDetails);
-    const driverEmail = await driverDetails.userDetails.email;
-    const driverName = await driverDetails.userDetails.firstName;
-
-    // Send email to truck driver
-    await mail.sendTruckDriverAcceptedEmail(driverEmail, driverName);
-
-
-    res.status(200).json({
-        status: 'success',
-        statusCode: 200,
-        message: 'Truck driver accepted successfully'
-    });
-
 
 
 };
+
+// Reject a truck driver
+admin.rejectTruckDriver = async (req, res) => {
+    try {
+        const admin = await req.admin;
+        const adminId = admin._id;
+        const truckDriverId = req.params.driver_id;
+        const reason_for_rejection = req.body.reason_for_rejection;
+        if (!reason_for_rejection) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Reason for rejection is required'
+            });
+        }
+
+        // Check if admin exist
+        const adminDetails = await Admin.findById(adminId);
+        if (!adminDetails) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Admin does not exist'
+            });
+        }
+
+        // Check if truck driver exist
+        const truckDriverDetails = await TruckDriver.findById(truckDriverId);
+        if (!truckDriverDetails) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Truck driver does not exist'
+            });
+
+        }
+
+        // Check if truck driver is already accepted
+        const truckDriverAccepted = await TruckDriver.findOne({
+            _id: truckDriverId,
+            accepted: 'verified'
+        });
+        if (truckDriverAccepted) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Truck driver is already verified'
+            });
+
+        }
+
+        // Reject truck driver
+        truckDriverDetails.accepted = 'rejected';
+        const rejectedDriver = await truckDriverDetails.save();
+
+        // Get Driver Email
+        const driverDetails = await TruckDriver.findById(rejectedDriver._id).populate('userDetails');
+
+        console.log(driverDetails);
+        const driverEmail = await driverDetails.userDetails.email;
+        const driverName = await driverDetails.userDetails.firstName;
+
+        // Send email to truck driver
+        await mail.sendTruckDriverRejectedEmail(driverEmail, driverName, reason_for_rejection);
+
+        res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'Truck driver rejected successfully'
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'error',
+            statusCode: 500,
+            message: 'Internal Server Error',
+        });
+    }
+
+}
+
 
 // Get all truck drivers
 admin.getAllDrivers = async (req, res) => {
@@ -342,8 +436,9 @@ admin.getUnverifiedDrivers = async (req, res) => {
 
         // Get all unverified truck drivers
         const truckDrivers = await TruckDriver.find({
-            accepted: false
+            accepted: 'unverified'
         }).populate('truckDetails').populate('userDetails');
+        console.log(truckDrivers);
         if (truckDrivers.length === 0) {
             return res.status(200).json({
                 status: 'success',
@@ -389,7 +484,7 @@ admin.getVerifiedDrivers = async (req, res) => {
         }
         // Get all verified truck drivers
         const truckDrivers = await TruckDriver.find({
-            accepted: true
+            accepted: 'verified'
         }).populate('truckDetails').populate('userDetails');
         if (truckDrivers.length === 0) {
             return res.status(200).json({
@@ -412,6 +507,234 @@ admin.getVerifiedDrivers = async (req, res) => {
             statusCode: 500,
             message: 'Internal Server Error',
         });
+    }
+}
+
+// Truck Drivers Rejected
+admin.getRejectedDrivers = async (req, res) => {
+    try {
+        const admin = await req.admin;
+        const adminId = admin._id;
+
+        // Check if admin exist
+        const adminDetails = await Admin.findById(adminId);
+        if (!adminDetails) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Admin does not exist'
+            });
+        }
+        // Get all rejected truck drivers
+        const truckDrivers = await TruckDriver.find({
+            accepted: 'rejected'
+        }).populate('truckDetails').populate('userDetails');
+        if (truckDrivers.length === 0) {
+            return res.status(200).json({
+                status: 'success',
+                statusCode: 200,
+                message: 'No truck drivers are rejected',
+                truckDrivers: []
+            });
+        }
+        res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'Truck drivers rejected retrieved successfully',
+            truckDrivers: truckDrivers
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'error',
+            statusCode: 500,
+            message: 'Internal Server Error',
+        });
+    }
+}
+
+
+// Total Driver (Approved, Declined, Awaiting Approval)
+admin.getTotalDrivers = async (req, res) => {
+    try {
+        const admin = await req.admin;
+        const adminId = admin._id;
+
+        // Check if admin exist
+
+        const adminDetails = await Admin.findById(adminId);
+        if (!adminDetails) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Admin does not exist'
+            });
+        }
+
+        // Get total truck drivers
+        const totalDrivers = await TruckDriver.find();
+        const totalDriversCount = await totalDrivers.length;
+
+        // Get total verified truck drivers
+        const totalVerifiedDrivers = await TruckDriver.find({
+            accepted: 'verified'
+        });
+        const totalVerifiedDriversCount = await totalVerifiedDrivers.length;
+
+        // Get total unverified truck drivers
+        const totalUnverifiedDrivers = await TruckDriver.find({
+            accepted: 'unverified'
+        });
+        const totalUnverifiedDriversCount = await totalUnverifiedDrivers.length;
+
+        // Get total rejected truck drivers
+        const totalRejectedDrivers = await TruckDriver.find({
+            accepted: 'rejected'
+        });
+        const totalRejectedDriversCount = await totalRejectedDrivers.length;
+
+        res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'Total truck drivers retrieved successfully',
+            data: {
+                total_drivers: totalDriversCount,
+                total_verified_drivers: totalVerifiedDriversCount,
+                total_unverified_drivers: totalUnverifiedDriversCount,
+                total_rejected_drivers: totalRejectedDriversCount
+            }
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'error',
+            statusCode: 500,
+            message: 'Internal Server Error',
+        });
+    }
+}
+
+
+// View Haulk Total Completed Orders
+admin.getTotalCompletedOrders = async (req, res) => {
+    try {
+        const admin = await req.admin;
+        const adminId = admin._id;
+
+        // Check if admin exist
+        const adminDetails = await Admin.findById(adminId);
+        if (!adminDetails) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Admin does not exist'
+            });
+        }
+
+        // Get total completed orders
+        const totalCompletedOrders = await OrderModel.find({
+            order_status: 'dropped_off'
+        });
+        const totalCompletedOrdersCount = await totalCompletedOrders.length;
+
+        res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'Total completed orders retrieved successfully',
+            data: {
+                total_completed_orders: totalCompletedOrdersCount
+            }
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'error',
+            statusCode: 500,
+            message: 'Internal Server Error',
+        });
+    }
+}
+
+// View Haulk Total Cargo Owners Accounts
+admin.getTotalCargoOwners = async (req, res) => {
+    try {
+        const admin = await req.admin;
+        const adminId = admin._id;
+
+        // Check if admin exist
+        const adminDetails = await Admin.findById(adminId);
+        if (!adminDetails) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Admin does not exist'
+            });
+        }
+
+        // Get total cargo owners
+        const totalCargoOwners = await CargoOwner.find();
+        const totalCargoOwnersCount = await totalCargoOwners.length;
+
+        res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'Total cargo owners retrieved successfully',
+            data: {
+                total_cargo_owners: totalCargoOwnersCount
+            }
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'error',
+            statusCode: 500,
+            message: 'Internal Server Error',
+        });
+    }
+}
+
+// api that returns haulk revenue
+admin.getHaulkRevenue = async (req, res) => {
+    try {
+        const admin = await req.admin;
+        const adminId = admin._id;
+
+        // Check if admin exist
+        const adminDetails = await Admin.findById(adminId);
+        if (!adminDetails) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Admin does not exist'
+            });
+        }
+
+        // Get total completed orders
+        const CompletedOrders = await OrderModel.find({
+            order_status: 'dropped_off'
+        });
+        const orders = await CompletedOrders;
+        // const amounts = orders.amount;
+        // let sum = 0;
+
+        // for (let i = 0; i < amounts.length; i++) {
+        //     sum += array[i];
+        // }
+        // console.log(sum);
+
+        // Get Total Amount Of Completed Orders
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'error',
+            statusCode: 500,
+            message: 'Internal Server Error',
+        });
+
     }
 }
 

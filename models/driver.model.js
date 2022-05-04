@@ -27,9 +27,13 @@ const truckDriverSchema = new Schema({
 
 
 accepted: {
-    type: Boolean,
+    // type: Boolean,
     // index: true,
-    default: false
+    // default: false
+    lowercase: true,
+    type: String,
+    enum: ['verified','unverified','rejected'],
+    default: 'unverified'
 },
 
 
