@@ -30,9 +30,9 @@ driverController.seeOpenOrders = async (req, res) => {
         message: orders,
       });
     } else {
-      res.status(500).json({
+      res.status(200).json({
         status: "error",
-        statuscode: 500,
+        statuscode: 200,
         message: "There is no order open for you",
       });
     }
@@ -60,9 +60,9 @@ driverController.acceptOrder = async (req, res) => {
       driver &&
       driver.orders.findIndex((x) => x.order_status !== "dropped_off");
     if (hasOrder !== -1) {
-      return res.status(500).json({
+      return res.status(200).json({
         status: "error",
-        statuscode: 500,
+        statuscode: 200,
         message: "you already have an unfinished order",
       });
     }
@@ -71,9 +71,9 @@ driverController.acceptOrder = async (req, res) => {
     });
     //   checks if another driver has picked up the order
     if (order.order_status === "accepted") {
-      return res.status(500).json({
+      return res.status(200).json({
         status: "error",
-        statuscode: 500,
+        statuscode: 200,
         message: "order has been picked up by driver",
       });
     }
