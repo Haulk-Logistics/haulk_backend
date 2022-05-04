@@ -1,5 +1,6 @@
 // import models
 const Driver = require("../models/driver.model");
+const Wallet = require("../models/driver_wallet.model");
 const Orders = require("../models/order.model");
 const mail = require("../services/mail.services");
 
@@ -56,7 +57,7 @@ driverController.acceptOrder = async (req, res) => {
     //   if user has an order don't accept another order
     const driver = await Driver.findOne({
       userDetails: req.user._id,
-    }).populate("orders");
+    }).populate("orders").populate("userDetails").populate("truckDetails");
     const hasOrder =
       driver &&
       driver.orders.findIndex((x) => x.order_status !== "dropped_off");
@@ -79,8 +80,13 @@ driverController.acceptOrder = async (req, res) => {
       });
     }
     //     updates the order status to active
+    //     and adds the driver to the order
     order.order_status = "accepted";
-    order.truck_driver = driver._id;
+    order.truck_driver_name = `${driver.userDetails.firstName} ${driver.userDetails.lastName}`;
+    order.truck_driver_phone = driver.userDetails.phoneNumber;
+    order.truck_driver_image= driver.truckDetails.driver_image;
+    order.truck_driver_truck_number = driver.truckDetails.license_plate_number;
+
     //     saves updated order status
     const accepted_order = await order.save();
     //     find driver who want's to accept order and insert accepted order into the order array

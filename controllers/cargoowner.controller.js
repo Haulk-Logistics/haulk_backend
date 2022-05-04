@@ -69,7 +69,7 @@ cargoOwnwer.getActiveOrder = async (req, res) => {
       ordered_by: user._id,
       transaction_ref: { $ne: 'paypending' },
       order_status: { $ne: "dropped_off" },
-    }).populate('truck_driver').populate('ordered_by');
+    }).populate('ordered_by');
     if (orders && orders.length > 0) {
       res.status(200).send({
         statuscode: 200,
