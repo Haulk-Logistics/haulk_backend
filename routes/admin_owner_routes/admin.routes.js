@@ -15,33 +15,35 @@ router.post("/auth/signup", adminController.signup);
 
 // Admin Signin
 router.post("/auth/signin", adminController.signIn);
+
 // router.get("/getAllAdmins", adminController.getAllAdmins);
 
 // Accept a truck driver
 router.put("/driver/accept_driver/:driver_id", isAdmin, adminController.acceptTruckDriver);
 
 // Reject a truck driver account / verification request
-// router.put("/auth/reject/:id", isAdmin, adminController.rejectTruckDriver);
-
-// View Haulk Total Drivers Accounts
-// router.get("/auth/view/haulk_total_drivers", isAdmin, adminController.viewHaulkTotalDrivers);
+router.put("/driver/reject_driver/:driver_id", isAdmin, adminController.rejectTruckDriver);
 
 // View Haulk Total Cargo Owners Accounts
+router.get("cargoowner/total_cargo_owners", isAdmin, adminController.getTotalCargoOwners);
 
 // View Haulk Total Completed Orders
+router.get("/order/haulk_completed_orders", isAdmin, adminController.getTotalCompletedOrders);
 
-// api that returns total driver (Approved, Declined, Awaiting Approval)
+// api that returns total driver (Approved, Declined, Awaiting Approval, total drivers)
+router.get("/driver/total_drivers", isAdmin, adminController.getTotalDrivers);
 
 // api that returns list of truck drivers awaiting approval
-router.get("/driver/awaiting_approval", isAdmin, adminController.getUnverifiedDrivers);
+router.get("/driver/awaiting_verification", isAdmin, adminController.getUnverifiedDrivers);
 
 // api that returns list of truck drivers approved
 router.get("/driver/approved", isAdmin, adminController.getVerifiedDrivers);
 
-// api that returns list of truck drivers declined
+// api that returns list of truck drivers rejected
+router.get("/driver/rejected", isAdmin, adminController.getRejectedDrivers);
 
-
-
+// api that returns haulk revenue
+// router.get("/haulk_revenue", isAdmin, adminController.getHaulkRevenue);
 
 
 

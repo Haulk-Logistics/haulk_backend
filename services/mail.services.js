@@ -86,14 +86,15 @@ mail.sendTruckDriverAcceptedEmail = async (email, driver_name) => {
 
 
 
-mail.sendTruckDriverRejectedEmail = async (email, driver_name) => {
+mail.sendTruckDriverRejectedEmail = async (email, driver_name, reason) => {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
         from: process.env.EMAIL,
         to: email,
-        subject: 'ACCOUNT VERIFIED',
+        subject: 'ACCOUNT REJECTED',
         text: `Hello ${driver_name},\n\n
         Your account has been rejected.\n\n
+        Reason: ${reason}\n\n
         Please contact the haulk admins directly if you have any questions.\n\n
         Regards,\n\n
         The haulk admins`
