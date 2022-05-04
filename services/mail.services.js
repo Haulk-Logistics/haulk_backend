@@ -62,7 +62,7 @@ mail.sendPasswordResetEmail = async (email, token) => {
 
 mail.sendTruckDriverAcceptedEmail = async (email, driver_name) => {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    const msg =  {
+    const msg = {
         from: process.env.EMAIL,
         to: email,
         subject: 'ACCOUNT VERIFIED',
@@ -83,4 +83,59 @@ mail.sendTruckDriverAcceptedEmail = async (email, driver_name) => {
     }
 
 };
+
+
+
+mail.sendTruckDriverRejectedEmail = async (email, driver_name) => {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: 'ACCOUNT VERIFIED',
+        text: `Hello ${driver_name},\n\n
+        Your account has been rejected.\n\n
+        Please contact the haulk admins directly if you have any questions.\n\n
+        Regards,\n\n
+        The haulk admins`
+    };
+
+    try {
+        await sgMail.send(msg);
+    } catch (error) {
+        console.error(error);
+        if (error.response) {
+            console.error(error.response.body)
+        }
+    }
+
+
+}
+
+
+
+mail.sendOrderAcceptedByDriverEmail = async (email, driver_name, order_id, user_name) => {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: 'ORDER ACCEPTED',
+        text: `Hello ${user_name},\n\n
+        Your order with Order ID: ${order_id} has been accepted by ${driver_name}.\n\n
+        Check Your Dashboard to see latest info/status about your Order\n\n
+
+
+        Please contact the haulk admins directly if you have any questions.\n\n
+        Regards,\n\n
+        The haulk admins`
+    };
+
+    try {
+        await sgMail.send(msg);
+    } catch (error) {
+        console.error(error);
+        if (error.response) {
+            console.error(error.response.body)
+        }
+    }
+}
 module.exports = mail;
