@@ -85,7 +85,8 @@ driverController.acceptOrder = async (req, res) => {
     order.truck_driver_name = `${driver.userDetails.firstName} ${driver.userDetails.lastName}`;
     order.truck_driver_phone = driver.userDetails.phoneNumber;
     order.truck_driver_image= driver.truckDetails.driver_image;
-    order.truck_driver_truck_number = driver.truckDetails.license_plate_number;
+    order.truck_driver_truck_number = driver.truckDetails.licence_plate_number;
+    console.log(order.truck_driver_truck_number);
 
     //     saves updated order status
     const accepted_order = await order.save();
@@ -111,7 +112,7 @@ driverController.acceptOrder = async (req, res) => {
       res.status(200).json({
         status: "success",
         statuscode: 200,
-        message: "you have successfully booked your order",
+        message: "you have successfully accepted an order",
       });
     }
   } catch (error) {
