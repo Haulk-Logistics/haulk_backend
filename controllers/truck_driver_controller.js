@@ -33,7 +33,7 @@ driverController.seeOpenOrders = async (req, res) => {
       });
     } else {
       res.status(200).json({
-        status: "error",
+        status: "success",
         statuscode: 200,
         message: [],
       });
