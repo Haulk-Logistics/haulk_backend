@@ -12,6 +12,7 @@ const Admin = require('../models/admin.model');
 const TruckDriver = require('../models/driver.model');
 const mail = require('../services/mail.services');
 const OrderModel = require('../models/order.model');
+const CargoOwner = require('../models/cargo_owner.model');
 const admin = {};
 
 // Create Admin
@@ -437,7 +438,7 @@ admin.getUnverifiedDrivers = async (req, res) => {
         // Get all unverified truck drivers
         const truckDrivers = await TruckDriver.find({
             accepted: 'unverified'
-        }).populate('truckDetails').populate('userDetails');
+        }).populate('truckDetails').populate('userDetails').populate('walletDetails');
         console.log(truckDrivers);
         if (truckDrivers.length === 0) {
             return res.status(200).json({
