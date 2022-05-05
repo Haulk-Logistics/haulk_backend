@@ -52,7 +52,17 @@ driverController.acceptOrder = async (req, res) => {
   const {
     id
   } = req.params;
-  // returns id which this pariticular order id
+
+  try {
+    await Orders.findById(id);
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({
+      status: "error",
+      statuscode: 404,
+      message: "Order Id Is Invalid",
+    });
+  }
   try {
     //   if user has an order don't accept another order
     const driver = await Driver.findOne({
@@ -71,11 +81,19 @@ driverController.acceptOrder = async (req, res) => {
     const order = await Orders.findOne({
       _id: id,
     }).populate('ordered_by');
+    if (!order) {
+      return res.status(404).json({
+        status: "error",
+        statuscode: 404,
+        message: "order not found",
+      });
+    }
+
     //   checks if another driver has picked up the order
     if (order.order_status === "accepted") {
-      return res.status(200).json({
+      return res.status(400).json({
         status: "error",
-        statuscode: 200,
+        statuscode: 400,
         message: "order has been picked up by driver",
       });
     }
@@ -99,23 +117,28 @@ driverController.acceptOrder = async (req, res) => {
       },
     }, {
       new: true,
-    }).populate('userDetails');
+    }).populate('userDetails').populate('walletDetails');
     if (updated_driver) {
       // ninety percent of order amount
-      const driverEarning = order.order_amount * 0.9;
+      const driverEarning = order.amount * 0.9;
       const fifty_percent_of_order_amount = driverEarning / 2;
 
-      //  Add 90 percent of Amount to driver wallet
+      // Add 90 percent of Amount to driver wallet
       const updatedWallet = await Wallet.findOne({
         user: req.user._id,
       });
       if (updatedWallet) {
-        //     update wallet balances
+        console.log(updated_driver.walletDetails);
+        // update wallet balances
         updatedWallet.currentBalance = await updatedWallet.currentBalance + fifty_percent_of_order_amount;
         updatedWallet.withdrawableBalance = await updatedWallet.withdrawableBalance + fifty_percent_of_order_amount;
-        //     save updated wallet balance
+
+
+        // save updated wallet balance
         await updatedWallet.save();
-        
+
+
+
       }
 
       // send Email notification to the user
@@ -133,10 +156,11 @@ driverController.acceptOrder = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: "error",
       statuscode: 500,
-      message: "you have issues accepting your order",
+      message: "Internal Server Error",
     });
   }
 };
@@ -280,9 +304,9 @@ driverController.updateOrderStatus = async (req, res) => {
         message: "Order with that id not found"
       });
     }
-    console.log(orderStatus);
     // Check If Valid Order Status contains the order status
-    if (!validOrderStatus.includes(orderStatusLower)) {
+
+    if (validOrderStatus.includes(orderStatusLower) === false) {
       return res.status(400).json({
         status: "error",
         statuscode: 400,
@@ -299,15 +323,19 @@ driverController.updateOrderStatus = async (req, res) => {
       });
     }
 
-
-
     order.order_status = orderStatus;
     //  save order
     const updatedOrder = await order.save();
     if (updatedOrder) {
       if (updatedOrder.order_status === "dropped_off") {
         // 90 percent of the order amount
-        const driverEarning = order.order_amount * 0.9;
+        // console.log(updatedOrder.amount);
+        const orderAmount = parseInt(updatedOrder.amount);
+        // console.log(orderAmount);
+
+
+
+        const driverEarning = orderAmount * 0.9;
         // 50 percent of the driver earnings
         const fifty_percent_of_order_amount = driverEarning / 2;
 
@@ -315,6 +343,7 @@ driverController.updateOrderStatus = async (req, res) => {
         const updated_wallet = await Wallet.findOne({
           user: driver_user_id,
         });
+
         if (updated_wallet) {
           //     update wallet balances
           updated_wallet.currentBalance = await updated_wallet.currentBalance - fifty_percent_of_order_amount;
@@ -322,14 +351,25 @@ driverController.updateOrderStatus = async (req, res) => {
 
           await updated_wallet.save();
 
-          return res.status(200).send({
-            statuscode: 200,
-            status: "success",
-            message: "Order status updated successfully",
-          });
+          // return res.status(200).send({
+          //   statuscode: 200,
+          //   status: "success",
+          //   message: "Order status updated successfully",
+          // });
         }
       }
+
+      return res.status(200).send({
+        statuscode: 200,
+        status: "success",
+        message: "Order status updated successfully",
+      });
+
+
     }
+
+
+
   } catch (error) {
     console.log(error)
     res.status(500).send({
