@@ -59,11 +59,12 @@ auth.signupCargoOwner = async (req, res, next) => {
 
 
         if (!req.body.phoneNumber) {
-            return res.status(400).json({
-                status: 'error',
-                statusCode: 400,
-                message: 'Phone number is required'
-            });
+            phoneNumber = '+234809000000';
+            // return res.status(400).json({
+            //     status: 'error',
+            //     statusCode: 400,
+            //     message: 'Phone number is required'
+            // });
         }
 
         if (!req.body.password) {

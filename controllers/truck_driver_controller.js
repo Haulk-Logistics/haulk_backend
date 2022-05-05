@@ -84,7 +84,7 @@ driverController.acceptOrder = async (req, res) => {
     order.order_status = "accepted";
     order.truck_driver_name = `${driver.userDetails.firstName} ${driver.userDetails.lastName}`;
     order.truck_driver_phone = driver.userDetails.phoneNumber;
-    order.truck_driver_image= driver.truckDetails.driver_image;
+    order.truck_driver_image = driver.truckDetails.driver_image;
     order.truck_driver_truck_number = driver.truckDetails.licence_plate_number;
     console.log(order.truck_driver_truck_number);
 
@@ -151,6 +151,7 @@ driverController.viewProfile = async (req, res) => {
 // route to view driver active orders
 driverController.activeOrder = async (req, res) => {
   try {
+
     // retruns all orders
     const activeOrder = await Driver.findOne({
       userDetails: req.user._id,
@@ -162,11 +163,7 @@ driverController.activeOrder = async (req, res) => {
         },
       },
     });
-
-    const theActiveOrder = await Orders.findById(activeOrder.orders[0]._id).populate('ordered_by');
-
-    // retruns orders where status != dropped_off
-    // console.log(activeOrder);
+    console.log(activeOrder);
     if (activeOrder.orders.length === 0) {
       return res.status(200).send({
         statuscode: 200,
@@ -174,7 +171,10 @@ driverController.activeOrder = async (req, res) => {
         message: "No active order",
       });
     }
+    const theActiveOrder = '';
     if (activeOrder.orders.length > 0) {
+      theActiveOrder = await Orders.findById(activeOrder.orders[0]._id).populate('ordered_by');
+      console.log(theActiveOrder);
       res.status(200).send({
         statuscode: 200,
         status: "success",
@@ -182,6 +182,7 @@ driverController.activeOrder = async (req, res) => {
       });
     }
   } catch (e) {
+    console.log(e);
     res.status(500).send({
       statuscode: 500,
       status: "error",
@@ -247,7 +248,7 @@ driverController.updateOrderStatus = async (req, res) => {
     // Turns Order Status To LowerCase Chracters
     const orderStatusLower = orderStatus.toString().toLowerCase();
     const validOrderStatus = ["accepted", "picked_up", "dropped_off", "in_transit"];
-  
+
     // Check if order with that id exists
     const order = await Orders.findOne({
       _id: id
@@ -261,8 +262,8 @@ driverController.updateOrderStatus = async (req, res) => {
         message: "Order with that id not found"
       });
     }
-console.log(orderStatus);
-// Check If Valid Order Status contains the order status
+    console.log(orderStatus);
+    // Check If Valid Order Status contains the order status
     if (!validOrderStatus.includes(orderStatusLower)) {
       return res.status(400).json({
         status: "error",
