@@ -101,6 +101,23 @@ driverController.acceptOrder = async (req, res) => {
       new: true,
     }).populate('userDetails');
     if (updated_driver) {
+      // ninety percent of order amount
+      const driverEarning = order.order_amount * 0.9;
+      const fifty_percent_of_order_amount = driverEarning / 2;
+
+      //  Add 90 percent of Amount to driver wallet
+      const updatedWallet = await Wallet.findOne({
+        user: req.user._id,
+      });
+      if (updatedWallet) {
+        //     update wallet balances
+        updatedWallet.currentBalance = await updatedWallet.currentBalance + fifty_percent_of_order_amount;
+        updatedWallet.withdrawableBalance = await updatedWallet.withdrawableBalance + fifty_percent_of_order_amount;
+        //     save updated wallet balance
+        await updatedWallet.save();
+        
+      }
+
       // send Email notification to the user
       const usersEmail = order.ordered_by.email;
       const driver_name = `${updated_driver.userDetails.firstName}`;
@@ -171,7 +188,7 @@ driverController.activeOrder = async (req, res) => {
         message: "No active order",
       });
     }
-    const theActiveOrder = '';
+    let theActiveOrder = '';
     if (activeOrder.orders.length > 0) {
       theActiveOrder = await Orders.findById(activeOrder.orders[0]._id).populate('ordered_by');
       console.log(theActiveOrder);
@@ -236,6 +253,7 @@ driverController.updateOrderStatus = async (req, res) => {
     const {
       id
     } = req.params;
+    const driver_user_id = await req.user._id;
 
     const orderStatus = await req.body.status;
     if (!orderStatus) {
@@ -272,15 +290,45 @@ driverController.updateOrderStatus = async (req, res) => {
       });
     }
 
+    // Check if order status is already accepted
+    if (order.order_status === "dropped_off") {
+      return res.status(400).json({
+        status: "error",
+        statuscode: 400,
+        message: "You cant update a completed order",
+      });
+    }
+
+
+
     order.order_status = orderStatus;
     //  save order
     const updatedOrder = await order.save();
     if (updatedOrder) {
-      return res.status(200).send({
-        statuscode: 200,
-        status: "success",
-        message: "Order status updated successfully",
-      });
+      if (updatedOrder.order_status === "dropped_off") {
+        // 90 percent of the order amount
+        const driverEarning = order.order_amount * 0.9;
+        // 50 percent of the driver earnings
+        const fifty_percent_of_order_amount = driverEarning / 2;
+
+        // update driver earnings
+        const updated_wallet = await Wallet.findOne({
+          user: driver_user_id,
+        });
+        if (updated_wallet) {
+          //     update wallet balances
+          updated_wallet.currentBalance = await updated_wallet.currentBalance - fifty_percent_of_order_amount;
+          updated_wallet.withdrawableBalance = await updated_wallet.withdrawableBalance + fifty_percent_of_order_amount;
+
+          await updated_wallet.save();
+
+          return res.status(200).send({
+            statuscode: 200,
+            status: "success",
+            message: "Order status updated successfully",
+          });
+        }
+      }
     }
   } catch (error) {
     console.log(error)

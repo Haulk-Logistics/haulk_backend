@@ -21,6 +21,11 @@ const WalletSchema = new Schema({
         default: 0
     },
 
+    total_earnings: {
+        type: Number,
+        default: 0
+    }
+
 
 });
 
