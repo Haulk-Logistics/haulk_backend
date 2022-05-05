@@ -467,6 +467,52 @@ admin.getUnverifiedDrivers = async (req, res) => {
     }
 }
 
+// Get driver by id
+admin.getDriverById = async (req, res) => {
+    const driver_id = req.params.driver_id;
+    try {
+        const admin = await req.admin;
+        const adminId = admin._id;
+    
+        const adminDetails = await Admin.findById(adminId);
+        if (!adminDetails) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Admin does not exist'
+            });
+
+        }
+
+        // Get each truck driver
+        const truckDriver = await TruckDriver.findById(driver_id).populate('truckDetails').populate('userDetails');
+        if (!truckDriver) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Truck driver with that id does not exist'
+            });
+
+        }
+        res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'Truck driver retrieved successfully',
+            truck_driver: truckDriver
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'error',
+            statusCode: 500,
+            message: 'Internal Server Error',
+        });
+
+    }
+
+}
+
 // Truck Drivers Verified
 admin.getVerifiedDrivers = async (req, res) => {
     try {
