@@ -469,7 +469,18 @@ admin.getUnverifiedDrivers = async (req, res) => {
 
 // Get driver by id
 admin.getDriverById = async (req, res) => {
-    const driver_id = req.params.driver_id;
+    const driver_id = await req.params.driver_id;
+    try{
+        await TruckDriver.findById(driver_id)
+    }
+    catch(error){
+        console.log(error);
+        res.status(400).json({
+            status: 'error',
+            statusCode: 400,
+            message: 'Driver Id Is Wrong, Invalid Or Not Found',
+        });
+    }
     try {
         const admin = await req.admin;
         const adminId = admin._id;
@@ -485,7 +496,7 @@ admin.getDriverById = async (req, res) => {
         }
 
         // Get each truck driver
-        const truckDriver = await TruckDriver.findById(driver_id).populate('truckDetails').populate('userDetails');
+        const truckDriver = await TruckDriver.findById(driver_id).populate('truckDetails').populate('userDetails').populate('walletDetails');
         if (!truckDriver) {
             return res.status(400).json({
                 status: 'error',
