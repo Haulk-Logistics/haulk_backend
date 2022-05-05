@@ -162,8 +162,11 @@ driverController.activeOrder = async (req, res) => {
         },
       },
     });
+
+    const theActiveOrder = await Orders.findById(activeOrder.orders[0]._id).populate('ordered_by');
+
     // retruns orders where status != dropped_off
-    console.log(activeOrder);
+    // console.log(activeOrder);
     if (activeOrder.orders.length === 0) {
       return res.status(200).send({
         statuscode: 200,
@@ -175,7 +178,7 @@ driverController.activeOrder = async (req, res) => {
       res.status(200).send({
         statuscode: 200,
         status: "success",
-        message: activeOrder.orders[0],
+        message: theActiveOrder,
       });
     }
   } catch (e) {
@@ -207,7 +210,7 @@ driverController.orderHistory = async (req, res) => {
       return res.status(200).send({
         statuscode: 200,
         status: "success",
-        message: "Order History is empty",
+        message: [],
       });
     }
     if (orders.length > 0) {
