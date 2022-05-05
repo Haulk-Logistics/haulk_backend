@@ -24,6 +24,7 @@ const Truck = require('../models/truck.model');
 const {
     upload_image
 } = require('../services/cloudinary.services');
+const Wallet = require('../models/driver_wallet.model');
 
 const auth = {};
 
@@ -464,7 +465,7 @@ auth.signupTruckDriver = async (req, res, next) => {
                 role: role,
                 verified: false,
             });
-             
+
 
             // Save User to user collection
             let newUser;
@@ -512,12 +513,21 @@ auth.signupTruckDriver = async (req, res, next) => {
 
             const newTruck = await truck.save();
 
+            // Create  new wallet for the driver
+            const wallet = await new Wallet({
+                user: newUser._id,
+            });
+
+            const newWallet = await wallet.save();
+
 
             // if new user is a truck driver save to truck driver collection
             // SIGN UP FOR TRUCK DRIVER
             const truckDriver = await new TruckDriver({
                 userDetails: newUser._id,
                 truckDetails: newTruck._id,
+                walletDetails: newWallet._id,
+                accepted: 'unverified'
             });
 
             const newTruckDriver = await truckDriver.save();
@@ -1022,14 +1032,16 @@ auth.changePassword = async (req, res, next) => {
     }
 }
 
-auth.getUserProfile = async (req,res) => {
+auth.getUserProfile = async (req, res) => {
     try {
-       const user = await User.findOne({_id: req.user.id});
-       res.status(200).json({
-           statuscode: 200,
-           status: "success",
-           message: user
-       })
+        const user = await User.findOne({
+            _id: req.user.id
+        });
+        res.status(200).json({
+            statuscode: 200,
+            status: "success",
+            message: user
+        })
     } catch (error) {
         return res.status(400).json({
             status: 'error',

@@ -444,7 +444,7 @@ admin.getUnverifiedDrivers = async (req, res) => {
                 status: 'success',
                 statusCode: 200,
                 message: 'No truck drivers are awaiting acceptance',
-                truckDrivers: []
+                truck_drivers: []
             });
 
         }
@@ -452,7 +452,7 @@ admin.getUnverifiedDrivers = async (req, res) => {
             status: 'success',
             statusCode: 200,
             message: 'Truck drivers awaiting approval retrieved successfully',
-            truckDrivers: truckDrivers
+            truck_drivers: truckDrivers
         });
 
     } catch (error) {

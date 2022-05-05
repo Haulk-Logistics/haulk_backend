@@ -4,6 +4,11 @@ const {
 } = mongoose;
 
 const WalletSchema = new Schema({
+    user: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    },
     currentBalance: {
         type: Number,
         min: 0,
