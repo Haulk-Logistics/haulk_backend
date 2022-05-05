@@ -750,11 +750,13 @@ auth.verifyUser = async (req, res, next) => {
                 });
             }
             if (user.verified) {
-                return res.status(409).json({
-                    status: 'error',
-                    statusCode: 409,
-                    message: 'User already verified'
-                });
+                // return res.status(409).json({
+                //     status: 'error',
+                //     statusCode: 409,
+                //     message: 'User already verified'
+                // });
+                return res.redirect(301, `${process.env.FRONTEND_URL}/verified`);
+
             }
             user.verified = true;
             await user.save();
