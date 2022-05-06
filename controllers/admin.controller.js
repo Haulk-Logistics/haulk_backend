@@ -763,7 +763,9 @@ admin.getHaulkRevenue = async (req, res) => {
         // Get total AMOUNT OF WALLET TOTAL EARNINGS
         const totalWalletEarnings = await Wallet.find();
         const totalWalletEarningsCount = await totalWalletEarnings.length;
+        
         let totalWalletEarningsAmount = 0;
+    
         for (let i = 0; i < totalWalletEarningsCount; i++) {
             totalWalletEarningsAmount += totalWalletEarnings[i].total_earnings;
         }
@@ -773,7 +775,7 @@ admin.getHaulkRevenue = async (req, res) => {
             status: 'success',
             statusCode: 200,
             message: 'Total wallet earnings retrieved successfully',
-            total: totalWalletEarningsCount,
+            total: totalWalletEarnings,
             data: {
                 total_revenue: totalWalletEarningsAmount
             }
