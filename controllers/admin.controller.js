@@ -13,6 +13,7 @@ const TruckDriver = require('../models/driver.model');
 const mail = require('../services/mail.services');
 const OrderModel = require('../models/order.model');
 const CargoOwner = require('../models/cargo_owner.model');
+const Wallet = require('../models/driver_wallet.model');
 const admin = {};
 
 // Create Admin
@@ -766,6 +767,7 @@ admin.getHaulkRevenue = async (req, res) => {
         for (let i = 0; i < totalWalletEarningsCount; i++) {
             totalWalletEarningsAmount += totalWalletEarnings[i].total_earnings;
         }
+
 
         res.status(200).json({
             status: 'success',
