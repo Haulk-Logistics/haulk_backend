@@ -349,6 +349,9 @@ driverController.updateOrderStatus = async (req, res) => {
           updated_wallet.currentBalance = await updated_wallet.currentBalance - fifty_percent_of_order_amount;
           updated_wallet.withdrawableBalance = await updated_wallet.withdrawableBalance + fifty_percent_of_order_amount;
 
+          // update total earnings
+          updated_wallet.total_earnings = await updated_wallet.total_earnings + driverEarning;
+
           await updated_wallet.save();
 
           // return res.status(200).send({
