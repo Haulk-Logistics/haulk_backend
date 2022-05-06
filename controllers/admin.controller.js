@@ -486,7 +486,17 @@ admin.getDriverById = async (req, res) => {
         }
 
         // Get each truck driver
-        const truckDriver = await TruckDriver.findById(driver_id).populate('truckDetails').populate('userDetails').populate('walletDetails');
+        let truckDriver;
+       try {
+         truckDriver = await TruckDriver.findById(driver_id).populate('truckDetails').populate('userDetails').populate('walletDetails');
+       
+       } catch (error) {
+        return res.status(400).json({
+            status: 'error',
+            statusCode: 400,
+            message: 'Invalid Truck driver Id'
+        });
+       }
         if (!truckDriver) {
             return res.status(400).json({
                 status: 'error',
