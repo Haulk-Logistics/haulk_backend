@@ -773,6 +773,7 @@ admin.getHaulkRevenue = async (req, res) => {
             status: 'success',
             statusCode: 200,
             message: 'Total wallet earnings retrieved successfully',
+            total: totalWalletEarningsCount,
             data: {
                 total_revenue: totalWalletEarningsAmount
             }
