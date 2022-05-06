@@ -4,19 +4,25 @@ require("dotenv").config({
     path: path.join(__dirname, `/configs/${process.env.APP_ENV?.trim()}.env`),
 });
 
+let pug = require('pug');
+
 
 const mail = {};
 
-mail.sendEmailVerificationMail = async (email, token) => {
+mail.sendEmailVerificationMail = async (body) => {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    // const html = await pug.renderFile( path.join(__dirname, '../email_templates/verify_email.pug'), body.data );
     const msg = {
-        to: email,
+        to: body.recipient,
         from: `${process.env.EMAIL}`, // Use the email address or domain you verified above
-        subject: 'Verify Your Email Address',
+        subject: body.subject,
+        html: html,
+        // attachments: body.attachments,
+        // priority:'high'
         html: `
         <div>
-                  <p>Welcome,
-                  Please verify your account by clicking <a href=${`${process.env.HOSTURL}/api/auth/verifyUser/?t=${token}`}>this</a> link
+                  <p>Welcome ${body.data.fullName},
+                  Please verify your account by clicking <a href=${`${process.env.HOSTURL}/api/auth/verifyUser/?t=${body.tokens}`}>this</a> link
                   </p>
           </div>
           `,

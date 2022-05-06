@@ -819,14 +819,34 @@ auth.resendVerificationEmail = async (req, res, next) => {
                 message: 'User already verified'
             });
         }
-        const token = jwt.sign({
+        const token = await jwt.sign({
                 _id: user._id,
                 email: user.email
             },
             process.env.TOKEN_SECRET, {
                 expiresIn: "1h"
             });
-        await mailService.sendEmailVerificationMail(user.email, token);
+
+ const fullName = `${user.firstName} ${user.lastName}`;
+ const userMail = await user.email;
+let body = {
+    data:{
+        link: `${process.env.FRONTEND_URL}/verify?t=${token}`,
+        name: fullName,
+        title: "VERIFY YOUR EMAIL"
+    },
+    subject: "VERIFY YOUR EMAIL",
+    tokens: token,
+    recipient: userMail,
+    attachments: [
+        {
+            filename: "email_cvi4fs.png",
+            path: "https://res.cloudinary.com/bazzscript/image/upload/v1651828378/email_cvi4fs.png",
+            cid: "email_cvi4fs"
+        }
+    ]
+}
+ await mailService.sendEmailVerificationMail(body);
         return res.status(200).json({
             status: 'success',
             statusCode: 200,
