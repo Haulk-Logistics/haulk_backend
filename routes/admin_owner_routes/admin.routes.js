@@ -24,9 +24,6 @@ router.put("/driver/accept_driver/:driver_id", isAdmin, adminController.acceptTr
 // Reject a truck driver account / verification request
 router.put("/driver/reject_driver/:driver_id", isAdmin, adminController.rejectTruckDriver);
 
-// api that returns a driver using driver_id
-router.get("/driver/:driver_id", isAdmin, adminController.getDriverById);
-
 // View Haulk Total Cargo Owners Accounts
 router.get("/cargoowner/total_cargo_owners", isAdmin, adminController.getTotalCargoOwners);
 
@@ -44,6 +41,9 @@ router.get("/driver/verified_drivers", isAdmin, adminController.getVerifiedDrive
 
 // api that returns list of truck drivers rejected
 router.get("/driver/rejected_drivers", isAdmin, adminController.getRejectedDrivers);
+
+// api that returns a driver using driver_id
+router.get("/driver/:driver_id", isAdmin, adminController.getDriverById);
 
 // api that returns haulk revenue
 router.get("/haulk_revenue", isAdmin, adminController.getHaulkRevenue);
