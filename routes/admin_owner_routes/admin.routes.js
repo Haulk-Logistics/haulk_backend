@@ -46,7 +46,7 @@ router.get("/driver/verified_drivers", isAdmin, adminController.getVerifiedDrive
 router.get("/driver/rejected_drivers", isAdmin, adminController.getRejectedDrivers);
 
 // api that returns haulk revenue
-// router.get("/haulk_revenue", isAdmin, adminController.getHaulkRevenue);
+router.get("/haulk_revenue", isAdmin, adminController.getHaulkRevenue);
 
 
 

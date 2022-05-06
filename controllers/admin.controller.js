@@ -470,17 +470,6 @@ admin.getUnverifiedDrivers = async (req, res) => {
 // Get driver by id
 admin.getDriverById = async (req, res) => {
     const driver_id = await req.params.driver_id;
-    try{
-        await TruckDriver.findById(driver_id)
-    }
-    catch(error){
-        console.log(error);
-        res.status(400).json({
-            status: 'error',
-            statusCode: 400,
-            message: 'Driver Id Is Wrong, Invalid Or Not Found',
-        });
-    }
     try {
         const admin = await req.admin;
         const adminId = admin._id;
@@ -770,11 +759,29 @@ admin.getHaulkRevenue = async (req, res) => {
             });
         }
 
-        // Get total completed orders
-        const CompletedOrders = await OrderModel.find({
-            order_status: 'dropped_off'
+        // Get total AMOUNT OF WALLET TOTAL EARNINGS
+        const totalWalletEarnings = await Wallet.find();
+        const totalWalletEarningsCount = await totalWalletEarnings.length;
+        let totalWalletEarningsAmount = 0;
+        for (let i = 0; i < totalWalletEarningsCount; i++) {
+            totalWalletEarningsAmount += totalWalletEarnings[i].total_earnings;
+        }
+
+        res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'Total wallet earnings retrieved successfully',
+            data: {
+                total_revenue: totalWalletEarningsAmount
+            }
         });
-        const orders = await CompletedOrders;
+        
+
+        
+        // const CompletedOrders = await OrderModel.find({
+        //     order_status: 'dropped_off'
+        // });
+        // const orders = await CompletedOrders;
         // const amounts = orders.amount;
         // let sum = 0;
 

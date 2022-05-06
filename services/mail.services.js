@@ -140,3 +140,7 @@ mail.sendOrderAcceptedByDriverEmail = async (email, driver_name, order_id, user_
     }
 }
 module.exports = mail;
+
+
+
+// let html = pug.renderFile( path.join(__dirname, '../views/email/verify_email.pug'), body.data );
