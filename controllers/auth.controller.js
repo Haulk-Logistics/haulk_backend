@@ -155,8 +155,29 @@ auth.signupCargoOwner = async (req, res, next) => {
                 expiresIn: "1h"
             });
 
+
+            const fullName = `${newUser.firstName} ${newUser.lastName}`;
+            const userMail = await newUser.email;
+           let body = {
+               data:{
+                   link: `${process.env.FRONTEND_URL}/verify?t=${token}`,
+                   name: fullName,
+                   title: "VERIFY YOUR EMAIL"
+               },
+               subject: "VERIFY YOUR EMAIL",
+               tokens: token,
+               recipient: userMail,
+               attachments: [
+                   {
+                       filename: "email_cvi4fs.png",
+                       path: "https://res.cloudinary.com/bazzscript/image/upload/v1651828378/email_cvi4fs.png",
+                       cid: "email_cvi4fs"
+                   }
+               ]
+           }
+
         // send a verification email
-        await mailService.sendEmailVerificationMail(newUser.email, token);
+        await mailService.sendEmailVerificationMail(body);
 
         // Account Created Successfully
         return res.status(201).json({

@@ -16,7 +16,7 @@ mail.sendEmailVerificationMail = async (body) => {
         to: body.recipient,
         from: `${process.env.EMAIL}`, // Use the email address or domain you verified above
         subject: body.subject,
-        html: html,
+        // html: html,
         // attachments: body.attachments,
         // priority:'high'
         html: `
