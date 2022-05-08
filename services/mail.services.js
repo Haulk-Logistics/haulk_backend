@@ -21,7 +21,7 @@ mail.sendEmailVerificationMail = async (body) => {
         // priority:'high'
         html: `
         <div>
-                  <p>Welcome ${body.data.fullName},
+                  <p>Welcome ${body.data.name},
                   Please verify your account by clicking <a href=${`${process.env.HOSTURL}/api/auth/verifyUser/?t=${body.tokens}`}>this</a> link
                   </p>
           </div>
