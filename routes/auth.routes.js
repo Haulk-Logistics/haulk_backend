@@ -25,11 +25,11 @@ router.post(
     .isEmpty()
     .withMessage("email is required")
     .toLowerCase(),
-  body("phoneNumber")
-    .not()
-    .isEmpty()
-    .isMobilePhone("en-NG")
-    .withMessage("phoneNumber is invalid"),
+  // body("phoneNumber")
+  //   .not()
+  //   .isEmpty()
+  //   .isMobilePhone("en-NG")
+  //   .withMessage("phoneNumber is invalid"),
   body("password")
     .not()
     .isEmpty()

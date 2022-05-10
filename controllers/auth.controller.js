@@ -24,6 +24,7 @@ const Truck = require('../models/truck.model');
 const {
     upload_image
 } = require('../services/cloudinary.services');
+const Wallet = require('../models/driver_wallet.model');
 
 const auth = {};
 
@@ -58,11 +59,12 @@ auth.signupCargoOwner = async (req, res, next) => {
 
 
         if (!req.body.phoneNumber) {
-            return res.status(400).json({
-                status: 'error',
-                statusCode: 400,
-                message: 'Phone number is required'
-            });
+            phoneNumber = '+234809000000';
+            // return res.status(400).json({
+            //     status: 'error',
+            //     statusCode: 400,
+            //     message: 'Phone number is required'
+            // });
         }
 
         if (!req.body.password) {
@@ -153,8 +155,29 @@ auth.signupCargoOwner = async (req, res, next) => {
                 expiresIn: "1h"
             });
 
+
+            const fullName = `${newUser.firstName} ${newUser.lastName}`;
+            const userMail = await newUser.email;
+           let body = {
+               data:{
+                   link: `${process.env.FRONTEND_URL}/verify?t=${token}`,
+                   name: fullName,
+                   title: "VERIFY YOUR EMAIL"
+               },
+               subject: "VERIFY YOUR EMAIL",
+               tokens: token,
+               recipient: userMail,
+               attachments: [
+                   {
+                       filename: "email_cvi4fs.png",
+                       path: "https://res.cloudinary.com/bazzscript/image/upload/v1651828378/email_cvi4fs.png",
+                       cid: "email_cvi4fs"
+                   }
+               ]
+           }
+
         // send a verification email
-        await mailService.sendEmailVerificationMail(newUser.email, token);
+        await mailService.sendEmailVerificationMail(body);
 
         // Account Created Successfully
         return res.status(201).json({
@@ -464,7 +487,7 @@ auth.signupTruckDriver = async (req, res, next) => {
                 role: role,
                 verified: false,
             });
-             
+
 
             // Save User to user collection
             let newUser;
@@ -512,12 +535,21 @@ auth.signupTruckDriver = async (req, res, next) => {
 
             const newTruck = await truck.save();
 
+            // Create  new wallet for the driver
+            const wallet = await new Wallet({
+                user: newUser._id,
+            });
+
+            const newWallet = await wallet.save();
+
 
             // if new user is a truck driver save to truck driver collection
             // SIGN UP FOR TRUCK DRIVER
             const truckDriver = await new TruckDriver({
                 userDetails: newUser._id,
                 truckDetails: newTruck._id,
+                walletDetails: newWallet._id,
+                accepted: 'unverified'
             });
 
             const newTruckDriver = await truckDriver.save();
@@ -739,11 +771,13 @@ auth.verifyUser = async (req, res, next) => {
                 });
             }
             if (user.verified) {
-                return res.status(409).json({
-                    status: 'error',
-                    statusCode: 409,
-                    message: 'User already verified'
-                });
+                // return res.status(409).json({
+                //     status: 'error',
+                //     statusCode: 409,
+                //     message: 'User already verified'
+                // });
+                return res.redirect(301, `${process.env.FRONTEND_URL}/verified`);
+
             }
             user.verified = true;
             await user.save();
@@ -806,14 +840,34 @@ auth.resendVerificationEmail = async (req, res, next) => {
                 message: 'User already verified'
             });
         }
-        const token = jwt.sign({
+        const token = await jwt.sign({
                 _id: user._id,
                 email: user.email
             },
             process.env.TOKEN_SECRET, {
                 expiresIn: "1h"
             });
-        await mailService.sendEmailVerificationMail(user.email, token);
+
+ const fullName = `${user.firstName} ${user.lastName}`;
+ const userMail = await user.email;
+let body = {
+    data:{
+        link: `${process.env.FRONTEND_URL}/verify?t=${token}`,
+        name: fullName,
+        title: "VERIFY YOUR EMAIL"
+    },
+    subject: "VERIFY YOUR EMAIL",
+    tokens: token,
+    recipient: userMail,
+    attachments: [
+        {
+            filename: "email_cvi4fs.png",
+            path: "https://res.cloudinary.com/bazzscript/image/upload/v1651828378/email_cvi4fs.png",
+            cid: "email_cvi4fs"
+        }
+    ]
+}
+ await mailService.sendEmailVerificationMail(body);
         return res.status(200).json({
             status: 'success',
             statusCode: 200,
@@ -1022,14 +1076,16 @@ auth.changePassword = async (req, res, next) => {
     }
 }
 
-auth.getUserProfile = async (req,res) => {
+auth.getUserProfile = async (req, res) => {
     try {
-       const user = await User.findOne({_id: req.user.id});
-       res.status(200).json({
-           statuscode: 200,
-           status: "success",
-           message: user
-       })
+        const user = await User.findOne({
+            _id: req.user.id
+        });
+        res.status(200).json({
+            statuscode: 200,
+            status: "success",
+            message: user
+        })
     } catch (error) {
         return res.status(400).json({
             status: 'error',

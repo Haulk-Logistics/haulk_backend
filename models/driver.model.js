@@ -10,7 +10,7 @@ const truckDriverSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Truck",
   },
-  wallet: {
+  walletDetails: {
     type: Schema.Types.ObjectId,
     ref:'Wallet'
   },

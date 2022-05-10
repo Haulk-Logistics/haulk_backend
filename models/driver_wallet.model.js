@@ -4,6 +4,11 @@ const {
 } = mongoose;
 
 const WalletSchema = new Schema({
+    user: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    },
     currentBalance: {
         type: Number,
         min: 0,
@@ -15,6 +20,11 @@ const WalletSchema = new Schema({
         min: 0,
         default: 0
     },
+
+    total_earnings: {
+        type: Number,
+        default: 0
+    }
 
 
 });

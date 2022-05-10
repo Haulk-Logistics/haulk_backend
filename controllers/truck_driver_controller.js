@@ -32,10 +32,10 @@ driverController.seeOpenOrders = async (req, res) => {
         message: orders,
       });
     } else {
-      res.status(500).json({
-        status: "error",
-        statuscode: 500,
-        message: "There is no order open for you",
+      res.status(200).json({
+        status: "success",
+        statuscode: 200,
+        message: [],
       });
     }
   } catch (error) {
@@ -52,7 +52,17 @@ driverController.acceptOrder = async (req, res) => {
   const {
     id
   } = req.params;
-  // returns id which this pariticular order id
+
+  try {
+    await Orders.findById(id);
+  } catch (error) {
+    console.log(error);
+    return res.status(404).json({
+      status: "error",
+      statuscode: 404,
+      message: "Order Id Is Invalid",
+    });
+  }
   try {
     //   if user has an order don't accept another order
     const driver = await Driver.findOne({
@@ -71,11 +81,19 @@ driverController.acceptOrder = async (req, res) => {
     const order = await Orders.findOne({
       _id: id,
     }).populate('ordered_by');
+    if (!order) {
+      return res.status(404).json({
+        status: "error",
+        statuscode: 404,
+        message: "order not found",
+      });
+    }
+
     //   checks if another driver has picked up the order
     if (order.order_status === "accepted") {
-      return res.status(200).json({
+      return res.status(400).json({
         status: "error",
-        statuscode: 200,
+        statuscode: 400,
         message: "order has been picked up by driver",
       });
     }
@@ -84,7 +102,7 @@ driverController.acceptOrder = async (req, res) => {
     order.order_status = "accepted";
     order.truck_driver_name = `${driver.userDetails.firstName} ${driver.userDetails.lastName}`;
     order.truck_driver_phone = driver.userDetails.phoneNumber;
-    order.truck_driver_image= driver.truckDetails.driver_image;
+    order.truck_driver_image = driver.truckDetails.driver_image;
     order.truck_driver_truck_number = driver.truckDetails.licence_plate_number;
     console.log(order.truck_driver_truck_number);
 
@@ -99,8 +117,30 @@ driverController.acceptOrder = async (req, res) => {
       },
     }, {
       new: true,
-    }).populate('userDetails');
+    }).populate('userDetails').populate('walletDetails');
     if (updated_driver) {
+      // ninety percent of order amount
+      const driverEarning = order.amount * 0.9;
+      const fifty_percent_of_order_amount = driverEarning / 2;
+
+      // Add 90 percent of Amount to driver wallet
+      const updatedWallet = await Wallet.findOne({
+        user: req.user._id,
+      });
+      if (updatedWallet) {
+        console.log(updated_driver.walletDetails);
+        // update wallet balances
+        updatedWallet.currentBalance = await updatedWallet.currentBalance + fifty_percent_of_order_amount;
+        updatedWallet.withdrawableBalance = await updatedWallet.withdrawableBalance + fifty_percent_of_order_amount;
+
+
+        // save updated wallet balance
+        await updatedWallet.save();
+
+
+
+      }
+
       // send Email notification to the user
       const usersEmail = order.ordered_by.email;
       const driver_name = `${updated_driver.userDetails.firstName}`;
@@ -116,10 +156,11 @@ driverController.acceptOrder = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error);
     res.status(500).json({
       status: "error",
       statuscode: 500,
-      message: "you have issues accepting your order",
+      message: "Internal Server Error",
     });
   }
 };
@@ -151,6 +192,7 @@ driverController.viewProfile = async (req, res) => {
 // route to view driver active orders
 driverController.activeOrder = async (req, res) => {
   try {
+
     // retruns all orders
     const activeOrder = await Driver.findOne({
       userDetails: req.user._id,
@@ -162,7 +204,6 @@ driverController.activeOrder = async (req, res) => {
         },
       },
     });
-    // retruns orders where status != dropped_off
     console.log(activeOrder);
     if (activeOrder.orders.length === 0) {
       return res.status(200).send({
@@ -171,14 +212,18 @@ driverController.activeOrder = async (req, res) => {
         message: "No active order",
       });
     }
+    let theActiveOrder = '';
     if (activeOrder.orders.length > 0) {
+      theActiveOrder = await Orders.findById(activeOrder.orders[0]._id).populate('ordered_by');
+      console.log(theActiveOrder);
       res.status(200).send({
         statuscode: 200,
         status: "success",
-        message: activeOrder.orders[0],
+        message: theActiveOrder,
       });
     }
   } catch (e) {
+    console.log(e);
     res.status(500).send({
       statuscode: 500,
       status: "error",
@@ -207,7 +252,7 @@ driverController.orderHistory = async (req, res) => {
       return res.status(200).send({
         statuscode: 200,
         status: "success",
-        message: "Order History is empty",
+        message: [],
       });
     }
     if (orders.length > 0) {
@@ -232,6 +277,7 @@ driverController.updateOrderStatus = async (req, res) => {
     const {
       id
     } = req.params;
+    const driver_user_id = await req.user._id;
 
     const orderStatus = await req.body.status;
     if (!orderStatus) {
@@ -244,7 +290,7 @@ driverController.updateOrderStatus = async (req, res) => {
     // Turns Order Status To LowerCase Chracters
     const orderStatusLower = orderStatus.toString().toLowerCase();
     const validOrderStatus = ["accepted", "picked_up", "dropped_off", "in_transit"];
-  
+
     // Check if order with that id exists
     const order = await Orders.findOne({
       _id: id
@@ -258,9 +304,9 @@ driverController.updateOrderStatus = async (req, res) => {
         message: "Order with that id not found"
       });
     }
-console.log(orderStatus);
-// Check If Valid Order Status contains the order status
-    if (!validOrderStatus.includes(orderStatusLower)) {
+    // Check If Valid Order Status contains the order status
+
+    if (validOrderStatus.includes(orderStatusLower) === false) {
       return res.status(400).json({
         status: "error",
         statuscode: 400,
@@ -268,16 +314,65 @@ console.log(orderStatus);
       });
     }
 
+    // Check if order status is already accepted
+    if (order.order_status === "dropped_off") {
+      return res.status(400).json({
+        status: "error",
+        statuscode: 400,
+        message: "You cant update a completed order",
+      });
+    }
+
     order.order_status = orderStatus;
     //  save order
     const updatedOrder = await order.save();
     if (updatedOrder) {
+      if (updatedOrder.order_status === "dropped_off") {
+        // 90 percent of the order amount
+        // console.log(updatedOrder.amount);
+        const orderAmount = parseInt(updatedOrder.amount);
+        // console.log(orderAmount);
+
+
+
+        const driverEarning = orderAmount * 0.9;
+        // 50 percent of the driver earnings
+        const fifty_percent_of_order_amount = driverEarning / 2;
+
+        // update driver earnings
+        const updated_wallet = await Wallet.findOne({
+          user: driver_user_id,
+        });
+
+        if (updated_wallet) {
+          //     update wallet balances
+          updated_wallet.currentBalance = await updated_wallet.currentBalance - fifty_percent_of_order_amount;
+          updated_wallet.withdrawableBalance = await updated_wallet.withdrawableBalance + fifty_percent_of_order_amount;
+
+          // update total earnings
+          updated_wallet.total_earnings = await updated_wallet.total_earnings + driverEarning;
+
+          await updated_wallet.save();
+
+          // return res.status(200).send({
+          //   statuscode: 200,
+          //   status: "success",
+          //   message: "Order status updated successfully",
+          // });
+        }
+      }
+
       return res.status(200).send({
         statuscode: 200,
         status: "success",
         message: "Order status updated successfully",
       });
+
+
     }
+
+
+
   } catch (error) {
     console.log(error)
     res.status(500).send({

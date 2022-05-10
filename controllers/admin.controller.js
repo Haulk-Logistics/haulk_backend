@@ -12,6 +12,8 @@ const Admin = require('../models/admin.model');
 const TruckDriver = require('../models/driver.model');
 const mail = require('../services/mail.services');
 const OrderModel = require('../models/order.model');
+const CargoOwner = require('../models/cargo_owner.model');
+const Wallet = require('../models/driver_wallet.model');
 const admin = {};
 
 // Create Admin
@@ -437,14 +439,14 @@ admin.getUnverifiedDrivers = async (req, res) => {
         // Get all unverified truck drivers
         const truckDrivers = await TruckDriver.find({
             accepted: 'unverified'
-        }).populate('truckDetails').populate('userDetails');
+        }).populate('truckDetails').populate('userDetails').populate('walletDetails');
         console.log(truckDrivers);
         if (truckDrivers.length === 0) {
             return res.status(200).json({
                 status: 'success',
                 statusCode: 200,
                 message: 'No truck drivers are awaiting acceptance',
-                truckDrivers: []
+                truck_drivers: []
             });
 
         }
@@ -452,7 +454,7 @@ admin.getUnverifiedDrivers = async (req, res) => {
             status: 'success',
             statusCode: 200,
             message: 'Truck drivers awaiting approval retrieved successfully',
-            truckDrivers: truckDrivers
+            truck_drivers: truckDrivers
         });
 
     } catch (error) {
@@ -464,6 +466,62 @@ admin.getUnverifiedDrivers = async (req, res) => {
         });
 
     }
+}
+
+// Get driver by id
+admin.getDriverById = async (req, res) => {
+    const driver_id = await req.params.driver_id;
+    try {
+        const admin = await req.admin;
+        const adminId = admin._id;
+    
+        const adminDetails = await Admin.findById(adminId);
+        if (!adminDetails) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Admin does not exist'
+            });
+
+        }
+
+        // Get each truck driver
+        let truckDriver;
+       try {
+         truckDriver = await TruckDriver.findById(driver_id).populate('truckDetails').populate('userDetails').populate('walletDetails');
+       
+       } catch (error) {
+        return res.status(400).json({
+            status: 'error',
+            statusCode: 400,
+            message: 'Invalid Truck driver Id'
+        });
+       }
+        if (!truckDriver) {
+            return res.status(400).json({
+                status: 'error',
+                statusCode: 400,
+                message: 'Truck driver with that id does not exist'
+            });
+
+        }
+        res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'Truck driver retrieved successfully',
+            truck_driver: truckDriver
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 'error',
+            statusCode: 500,
+            message: 'Internal Server Error',
+        });
+
+    }
+
 }
 
 // Truck Drivers Verified
@@ -712,11 +770,33 @@ admin.getHaulkRevenue = async (req, res) => {
             });
         }
 
-        // Get total completed orders
-        const CompletedOrders = await OrderModel.find({
-            order_status: 'dropped_off'
+        // Get total AMOUNT OF WALLET TOTAL EARNINGS
+        const totalWalletEarnings = await Wallet.find();
+        const totalWalletEarningsCount = await totalWalletEarnings.length;
+        
+        let totalWalletEarningsAmount = 0;
+    
+        for (let i = 0; i < totalWalletEarningsCount; i++) {
+            totalWalletEarningsAmount += totalWalletEarnings[i].total_earnings;
+        }
+
+
+        res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            message: 'Total wallet earnings retrieved successfully',
+            total: totalWalletEarningsCount,
+            data: {
+                total_revenue: totalWalletEarningsAmount
+            }
         });
-        const orders = await CompletedOrders;
+        
+
+        
+        // const CompletedOrders = await OrderModel.find({
+        //     order_status: 'dropped_off'
+        // });
+        // const orders = await CompletedOrders;
         // const amounts = orders.amount;
         // let sum = 0;
 
