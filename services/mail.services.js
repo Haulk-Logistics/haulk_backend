@@ -1,7 +1,7 @@
 const sgMail = require('@sendgrid/mail');
 var path = require('path');
 require("dotenv").config({
-    path: path.join(__dirname, `/configs/${process.env.APP_ENV?.trim()}.env`),
+    path: path.join(__dirname, `/config/${process.env.APP_ENV?.trim()}.env`),
 });
 
 let pug = require('pug');
