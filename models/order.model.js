@@ -2,7 +2,7 @@ const { Schema, model } = require("mongoose");
 const orderSchema = new Schema({
   ordered_by: {
     type: Schema.Types.ObjectId,
-    ref: "cargoowner",
+    ref: "User",
     required: [true, 'user id is required']
   },
   transaction_id: {
@@ -14,15 +14,35 @@ const orderSchema = new Schema({
     // ref: "transactions",
     // required: [true, 'transaction Id is required']
   },
-  truck_driver:{
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    default: null,
-  },
+
+  // truck_driver:{
+  //   type: Schema.Types.ObjectId,
+  //   ref: "TruckDriver",
+  //   default: null,
+  // },
+
+truck_driver_name:{
+  type: String,
+  default: "non"
+},
+truck_driver_image:{
+  type: String,
+  default: "non"
+},
+truck_driver_phone:{
+  type: String,
+  default: "non"
+},
+truck_driver_truck_number:{
+  type: String,
+  default: "non"
+},
+
   nature_of_goods: {
     type: String,
     required: [true, 'nature of good is required'],
   },
+
   truck_type: {
     type: String,
     require: [true, 'truck type is required'],

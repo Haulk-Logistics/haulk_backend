@@ -67,9 +67,9 @@ cargoOwnwer.getActiveOrder = async (req, res) => {
     const user = await req.user;
     const orders = await Order.find({
       ordered_by: user._id,
-      // transaction_ref: { $ne: 'paypending' },
-      // order_status: { $ne: "dropped_off" },
-    });
+      transaction_ref: { $ne: 'paypending' },
+      order_status: { $ne: "dropped_off" },
+    }).populate('ordered_by');
     if (orders && orders.length > 0) {
       res.status(200).send({
         statuscode: 200,
@@ -116,9 +116,10 @@ cargoOwnwer.getProfile = async (req, res) => {
 };
 
 cargoOwnwer.getEachOrder = async (req, res) => {
-  const { id } = req.params
-  console.log(id);
+
   try {
+    const { id } = req.params
+    // console.log(id);
     const order = await Order.findOne({
       // ordered_by: req.user._id,
       _id: id

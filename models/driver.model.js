@@ -10,7 +10,7 @@ const truckDriverSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Truck",
   },
-  wallet: {
+  walletDetails: {
     type: Schema.Types.ObjectId,
     ref:'Wallet'
   },
@@ -27,9 +27,13 @@ const truckDriverSchema = new Schema({
 
 
 accepted: {
-    type: Boolean,
+    // type: Boolean,
     // index: true,
-    default: false
+    // default: false
+    lowercase: true,
+    type: String,
+    enum: ['verified','unverified','rejected'],
+    default: 'unverified'
 },
 
 
