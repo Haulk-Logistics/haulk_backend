@@ -156,25 +156,23 @@ auth.signupCargoOwner = async (req, res, next) => {
             });
 
 
-            const fullName = `${newUser.firstName} ${newUser.lastName}`;
-            const userMail = await newUser.email;
-           let body = {
-               data:{
-                   link: `${process.env.FRONTEND_URL}/verify?t=${token}`,
-                   name: fullName,
-                   title: "VERIFY YOUR EMAIL"
-               },
-               subject: "VERIFY YOUR EMAIL",
-               tokens: token,
-               recipient: userMail,
-               attachments: [
-                   {
-                       filename: "email_cvi4fs.png",
-                       path: "https://res.cloudinary.com/bazzscript/image/upload/v1651828378/email_cvi4fs.png",
-                       cid: "email_cvi4fs"
-                   }
-               ]
-           }
+        const fullName = `${newUser.firstName} ${newUser.lastName}`;
+        const userMail = await newUser.email;
+        let body = {
+            data: {
+                link: `${process.env.FRONTEND_URL}/verify?t=${token}`,
+                name: fullName,
+                title: "VERIFY YOUR EMAIL"
+            },
+            subject: "VERIFY YOUR EMAIL",
+            tokens: token,
+            recipient: userMail,
+            attachments: [{
+                filename: "email_cvi4fs.png",
+                path: "https://res.cloudinary.com/bazzscript/image/upload/v1651828378/email_cvi4fs.png",
+                cid: "email_cvi4fs"
+            }]
+        }
 
         // send a verification email
         await mailService.sendEmailVerificationMail(body);
@@ -203,37 +201,37 @@ auth.signupTruckDriver = async (req, res, next) => {
 
 
     try {
-        const form = new formidable.IncomingForm();
+        const form = await new formidable.IncomingForm();
 
-        form.parse(req, async (err, fields, files) => {
+        await form.parse(req, async (err, fields, files) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({
                     status: 'error',
                     statusCode: 500,
-                    message: "error parsing form, please try again, if error persists, contact admin"
+                    message: "Error parsing form, please try again, if error persists, contact admin"
                 });
             }
 
-            const firstName = fields.firstName;
-            const lastName = fields.lastName;
-            const email = fields.email;
-            const phoneNumber = fields.phoneNumber;
-            const password = fields.password;
-            const role = fields.role;
-            const truckType = fields.truckType;
-            const truckSize = fields.truckSize;
-            const licencePlateNumber = fields.licencePlateNumber;
+            const firstName = await fields.firstName;
+            const lastName = await fields.lastName;
+            const email = await fields.email;
+            const phoneNumber = await fields.phoneNumber;
+            const password = await fields.password;
+            const role = await fields.role;
+            const truckType = await fields.truckType;
+            const truckSize = await fields.truckSize;
+            const licencePlateNumber = await fields.licencePlateNumber;
 
             // File Uploads
-            const driverLicenseImage = files.driverLicenseImage;
-            const vehicleLicenseImage = files.vehicleLicenseImage;
-            const certificateOfInsuranceImage = files.certificateOfInsuranceImage;
-            const certificateOfRoadWorthinessImage = files.certificateOfRoadWorthinessImage;
-            const transitGoodsLicenseImage = files.transitGoodsLicenseImage;
-            const portPassesImage = files.portPassesImage;
-            const truckImage = files.truckImage;
-            const driverImage = files.driverImage;
+            const driverLicenseImage = await files.driverLicenseImage;
+            const vehicleLicenseImage = await files.vehicleLicenseImage;
+            const certificateOfInsuranceImage = await files.certificateOfInsuranceImage;
+            const certificateOfRoadWorthinessImage = await files.certificateOfRoadWorthinessImage;
+            const transitGoodsLicenseImage = await files.transitGoodsLicenseImage;
+            const portPassesImage = await files.portPassesImage;
+            const truckImage = await files.truckImage;
+            const driverImage = await files.driverImage;
 
 
             // Confirm All Inputs are Valid
@@ -561,11 +559,30 @@ auth.signupTruckDriver = async (req, res, next) => {
                     email: newUser.email
                 },
                 process.env.TOKEN_SECRET, {
-                    expiresIn: "6h"
+                    expiresIn: "10h"
                 });
 
+            const fullName = `${newUser.firstName} ${newUser.lastName}`;
+            const userMail = await newUser.email;
+
+            const body = {
+                data: {
+                    link: `${process.env.FRONTEND_URL}/verify?t=${token}`,
+                    name: fullName,
+                    title: "VERIFY YOUR EMAIL"
+                },
+                subject: "VERIFY YOUR EMAIL",
+                tokens: token,
+                recipient: userMail,
+                attachments: [{
+                    filename: "email_cvi4fs.png",
+                    path: "https://res.cloudinary.com/bazzscript/image/upload/v1651828378/email_cvi4fs.png",
+                    cid: "email_cvi4fs"
+                }]
+            }
+
             // send a verification email
-            await mailService.sendEmailVerificationMail(newUser.email, token);
+            await mailService.sendEmailVerificationMail(body);
 
             return res.status(201).json({
                 status: 'success',
@@ -848,26 +865,24 @@ auth.resendVerificationEmail = async (req, res, next) => {
                 expiresIn: "1h"
             });
 
- const fullName = `${user.firstName} ${user.lastName}`;
- const userMail = await user.email;
-let body = {
-    data:{
-        link: `${process.env.FRONTEND_URL}/verify?t=${token}`,
-        name: fullName,
-        title: "VERIFY YOUR EMAIL"
-    },
-    subject: "VERIFY YOUR EMAIL",
-    tokens: token,
-    recipient: userMail,
-    attachments: [
-        {
-            filename: "email_cvi4fs.png",
-            path: "https://res.cloudinary.com/bazzscript/image/upload/v1651828378/email_cvi4fs.png",
-            cid: "email_cvi4fs"
+        const fullName = `${user.firstName} ${user.lastName}`;
+        const userMail = await user.email;
+        let body = {
+            data: {
+                link: `${process.env.FRONTEND_URL}/verify?t=${token}`,
+                name: fullName,
+                title: "VERIFY YOUR EMAIL"
+            },
+            subject: "VERIFY YOUR EMAIL",
+            tokens: token,
+            recipient: userMail,
+            attachments: [{
+                filename: "email_cvi4fs.png",
+                path: "https://res.cloudinary.com/bazzscript/image/upload/v1651828378/email_cvi4fs.png",
+                cid: "email_cvi4fs"
+            }]
         }
-    ]
-}
- await mailService.sendEmailVerificationMail(body);
+        await mailService.sendEmailVerificationMail(body);
         return res.status(200).json({
             status: 'success',
             statusCode: 200,
