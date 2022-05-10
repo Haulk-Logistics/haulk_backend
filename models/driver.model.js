@@ -18,6 +18,8 @@ const truckDriverSchema = new Schema({
   //   type: Boolean,
   //   default: false
   // },
+
+  // wrong implementation of orders, this shouldnt be an array, please correct when you have the time
   orders: [
     {
       type: Schema.Types.ObjectId,
