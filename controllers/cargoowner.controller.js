@@ -116,9 +116,10 @@ cargoOwnwer.getProfile = async (req, res) => {
 };
 
 cargoOwnwer.getEachOrder = async (req, res) => {
-  const { id } = req.params
-  console.log(id);
+
   try {
+    const { id } = req.params
+    // console.log(id);
     const order = await Order.findOne({
       // ordered_by: req.user._id,
       _id: id

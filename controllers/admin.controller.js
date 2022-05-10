@@ -470,8 +470,8 @@ admin.getUnverifiedDrivers = async (req, res) => {
 
 // Get driver by id
 admin.getDriverById = async (req, res) => {
-    const driver_id = await req.params.driver_id;
     try {
+    const driver_id = await req.params.driver_id;
         const admin = await req.admin;
         const adminId = admin._id;
     
