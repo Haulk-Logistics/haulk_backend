@@ -8,10 +8,11 @@ const driverController = {};
 
 // route to see open orders
 driverController.seeOpenOrders = async (req, res) => {
-  const {
-    _id
-  } = req.user;
+
   try {
+    const {
+      _id
+    } = req.user;
     const driverTruckDetails = await Driver.findOne({
       userDetails: _id,
     }).populate("truckDetails", "truck_type");
@@ -53,7 +54,16 @@ driverController.acceptOrder = async (req, res) => {
     id
   } = req.params;
 
+  if (!id) {
+    return res.status(400).send({
+      statuscode: 400,
+      status: "error",
+      message: "No order id provided",
+    });
+  }
+
   try {
+
     await Orders.findById(id);
   } catch (error) {
     console.log(error);
@@ -173,8 +183,15 @@ driverController.viewProfile = async (req, res) => {
         userDetails: req.user._id,
       })
       .populate("userDetails")
-      .populate("truckDetails");
-    // retruns orders where status != dropped_off
+      .populate("truckDetails")
+      .populate("walletDetails");
+    if (!driverProfile) {
+      return res.status(404).json({
+        status: "error",
+        statuscode: 404,
+        message: "Driver With User Id Not Found",
+      });
+    }
     res.status(200).send({
       statuscode: 200,
       status: "success",
@@ -192,7 +209,6 @@ driverController.viewProfile = async (req, res) => {
 // route to view driver active orders
 driverController.activeOrder = async (req, res) => {
   try {
-
     // retruns all orders
     const activeOrder = await Driver.findOne({
       userDetails: req.user._id,
