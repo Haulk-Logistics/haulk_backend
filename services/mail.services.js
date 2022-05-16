@@ -1,7 +1,7 @@
 const sgMail = require('@sendgrid/mail');
 var path = require('path');
 require("dotenv").config({
-    path: path.join(__dirname, `/config/${process.env.APP_ENV?.trim()}.env`),
+    path: path.join(__dirname, `/configs/${process.env.APP_ENV?.trim()}.env`),
 });
 
 let pug = require('pug');
@@ -29,6 +29,8 @@ mail.sendEmailVerificationMail = async (body) => {
     };
     try {
         await sgMail.send(msg);
+    console.log(sgMail);
+
     } catch (error) {
         console.error(error);
         if (error.response) {
@@ -43,6 +45,7 @@ mail.sendEmailVerificationMail = async (body) => {
 
 mail.sendPasswordResetEmail = async (email, token) => {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    
     const msg = {
         to: email,
         from: `${process.env.EMAIL}`,
