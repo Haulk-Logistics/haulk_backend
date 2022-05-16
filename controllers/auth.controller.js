@@ -175,7 +175,8 @@ auth.signupCargoOwner = async (req, res, next) => {
         }
 
         // send a verification email
-        await mailService.sendEmailVerificationMail(body);
+       const d = await mailService.sendEmailVerificationMail(body);
+       console.log(d);
 
         // Account Created Successfully
         return res.status(201).json({
