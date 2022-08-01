@@ -236,7 +236,7 @@ book_truck_controller.initialize_payment = async (req, res) => {
           transactionAmount: amount,
           transactionStatus: "pending",
           transactionDescription: "Payment for Order",
-          transactionReference: response.data.reference || "",
+          transactionReference: response.data.reference,
         });
 
         // Save Transaction to Database
@@ -266,6 +266,8 @@ book_truck_controller.initialize_payment = async (req, res) => {
           authorization_url: response.data.authorization_url,
         });
       });
+
+      
     });
   } catch (error) {
     console.log(error);

@@ -129,7 +129,7 @@ module.exports.isAuthorized = async (req, res, next) => {
     }
 
 
-}
+};
 
 // Confirm User is a truck driver
 module.exports.isTruckDriver = async (req, res, next) => {

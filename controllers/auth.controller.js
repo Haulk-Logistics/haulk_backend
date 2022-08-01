@@ -204,7 +204,7 @@ auth.signupTruckDriver = async (req, res, next) => {
     try {
         const form = await new formidable.IncomingForm();
 
-        await form.parse(req, async (err, fields, files) => {
+        form.parse(req, async (err, fields, files) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({
@@ -217,7 +217,7 @@ auth.signupTruckDriver = async (req, res, next) => {
             const firstName = await fields.firstName;
             const lastName = await fields.lastName;
             const email = await fields.email;
-            const phoneNumber = await fields.phoneNumber;
+            let phoneNumber = await fields.phoneNumber;
             const password = await fields.password;
             const role = await fields.role;
             const truckType = await fields.truckType;
@@ -556,12 +556,12 @@ auth.signupTruckDriver = async (req, res, next) => {
 
             // Generate JWT Token
             const token = jwt.sign({
-                    _id: newUser._id,
-                    email: newUser.email
-                },
+                _id: newUser._id,
+                email: newUser.email
+            },
                 process.env.TOKEN_SECRET, {
-                    expiresIn: "10h"
-                });
+                expiresIn: "10h"
+            });
 
             const fullName = `${newUser.firstName} ${newUser.lastName}`;
             const userMail = await newUser.email;
@@ -580,7 +580,7 @@ auth.signupTruckDriver = async (req, res, next) => {
                     path: "https://res.cloudinary.com/bazzscript/image/upload/v1651828378/email_cvi4fs.png",
                     cid: "email_cvi4fs"
                 }]
-            }
+            };
 
             // send a verification email
             await mailService.sendEmailVerificationMail(body);

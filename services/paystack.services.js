@@ -19,10 +19,12 @@ paystack.initializePayment = (form, mycallback) => {
 
     const callback = (error, response, body) => {
         return mycallback(error, body);
-    }
+    };
     request.post(options, callback);
 
 };
+
+
 
 
 
@@ -35,10 +37,10 @@ paystack.verifyPayment = (ref, mycallback) => {
             'content-type': 'application/json',
             'cache-control': 'no-cache'
        }
-    }
+    };
     const callback = (error, response, body)=>{
         return mycallback(error, body);
-    }
+    };
     request(options,callback);
 };
 
